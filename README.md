@@ -137,7 +137,7 @@ Task creation
 
 -   void setIterations(unsigned long newIterations)
 
-    Set a new iteration count  If you use this call, followed by a restart, it will not have any effect since restart resets the iteration count to the original value.
+    Set a new iteration count. If you use this call, followed by a restart, it will not have any effect since restart resets the iteration count to the original value.
 
     The effect of the last two calls is unpredictable so it's advisable to disable the task before executing either and then enable it again.
  
