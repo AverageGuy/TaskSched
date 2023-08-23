@@ -3,6 +3,8 @@ Cooperative multitasking library.
 Overview
 ========
 
+THIS LIBRART ISN'T READY FOR PRODUCTION.  DON'T BE SURPRISED IF IT DOESN'T WORK OR IF IT CHANGES WITHOUT WARNING.
+
 Yet another cooperative multitasking scheduler. I was unable to make the
 current crop of schedulers work correctly, so I decided to write my own.
 This version is a simpler implementation of the flavor of TaskScheduler
