@@ -61,7 +61,7 @@ class Task
         String getName();
         unsigned long mIterationCount;
         void setInterval(unsigned long newInterval);
-        void setIterations(unsigned long newIterations)
+        void setIterations(unsigned long newIterations);
     private:
         bool mRunImmediate;
         bool doShow=true;
