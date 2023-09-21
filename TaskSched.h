@@ -5,7 +5,6 @@
 #include <list>
 using namespace std;
 
-
 typedef std::function<void(void)> voidFuncType;
 
 struct savedInitial {
