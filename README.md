@@ -46,52 +46,49 @@ Usage
 Task creation
 -------------
 
--   Task(const voidFuncType & callBack, unsigned long interval=5000,\
+-   _Task(const voidFuncType & callBack, unsigned long interval=5000,\
     bool enabled=false,\
     unsigned long iterations=0,\
     String name=\"Unk\",\
-    bool runImmediate=false)
+    bool runImmediate=false)_
 
--   Task(const voidFuncType & callBack)
+-   _Task(const voidFuncType & callBack)
 
--   callBack is a function function that will be called when the task
+-   _callBack_ is a function function that will be called when the task
     has been enabled, the iteration count is still greater than zero and
     the interval has expired.
 
--   interval is a unsigned long integer specifying the number of
+-  _interval_ is a unsigned long integer specifying the number of
     milliseconds between executions passes.
 
--   enabled is a flag indicating the task should be placed in the run
+-   _enabled_ is a flag indicating the task should be placed in the run
     queue, if set to true.
 
--   iterations is a long integer asking that the task should be run for
+-   _iterations_ is a long integer asking that the task should be run for
     only the passed value of iterations. If the value is zero then task
     should be run without a limit of iterations.
 
--   name is a String value of a name of the task.
+-   _name_ is a String value of a name of the task.
 
-```{=html}
-<!-- -->
-```
--   runImmeidate is a boolean flag that directs the scheduler to run the
+-   _runImmeidate_ is a boolean flag that directs the scheduler to run the
     callback immediately rather than wait for the interval to expire.
     False says to wait for the interval to run the task.
 
--   bool isFirstIteration();
+-   _bool isFirstIteration();_
 
 -   Returns true if this is the first itereation
 
--   bool isLastIteration();
+-   _bool isLastIteration();_
 
 -   Returns true if this is the lastitereation
 
--   bool fRunImmediate(bool)
+-   _bool fRunImmediate(bool)
 
 -   If passed a true value then the task will be run immediately as soon
     as the scheduler processes the task. It is intended to be run after
     a restart function call.
 
--   void restart();
+-   _void restart();
 
 -   Calling restart uses the values saved at task instantiation, but
     leaves the task disabled. If you wish to schedule the task you must
@@ -99,13 +96,13 @@ Task creation
     as iterations and interval, use the functions provided. The original
     saved parameters are not modified.
 
--   void enable();
+-   _void enable();
 
 -   Enable the task. It will be run during the next iteration of the
     scheduler or after the interval is completed if fRunImmediate was
     not called with a true value.
 
--   void disable();
+-   _void disable();
 
 -   Disable the task. If you disable a task while running and then
     enable it later, the iteration count is retained. That is, if the
@@ -113,22 +110,22 @@ Task creation
     when disable was called, then if you enable it at a later time, the
     task will complete 4 more iterations.
 
--   bool isEnabled();
+-   _bool isEnabled();
 
 -   Test to see if the task is enabled. Returns true if enabled.
 
--   void setCallback(const voidFuncType &);
+-   _void setCallback(const voidFuncType &);
 
 -   Set a new function for the callback. This is best used after a reset
     but will work on an enabled task. The next iteration of the task
     will use the new callback.
 
--   void runIt();
+-   _void runIt();
 
 -   This is the function the scheduler uses to schedule the task, if
     needed. It shouldn't be called by the user's program.
 
--   String getName();
+-   _String getName();
 
 -   Return the name of the task in a String.
 
