@@ -52,7 +52,7 @@ Task creation
     String name=\"Unk\",\
     bool runImmediate=false)_
 
--   _Task(const voidFuncType & callBack)
+-   _Task(const voidFuncType & callBack)_
 
 -   _callBack_ is a function function that will be called when the task
     has been enabled, the iteration count is still greater than zero and
@@ -82,13 +82,13 @@ Task creation
 
 -   Returns true if this is the lastitereation
 
--   _bool fRunImmediate(bool)
+-   _bool fRunImmediate(bool)_
 
 -   If passed a true value then the task will be run immediately as soon
     as the scheduler processes the task. It is intended to be run after
     a restart function call.
 
--   _void restart();
+-   _void restart();_
 
 -   Calling restart uses the values saved at task instantiation, but
     leaves the task disabled. If you wish to schedule the task you must
@@ -96,13 +96,13 @@ Task creation
     as iterations and interval, use the functions provided. The original
     saved parameters are not modified.
 
--   _void enable();
+-   _void enable();_
 
 -   Enable the task. It will be run during the next iteration of the
     scheduler or after the interval is completed if fRunImmediate was
     not called with a true value.
 
--   _void disable();
+-   _void disable();_
 
 -   Disable the task. If you disable a task while running and then
     enable it later, the iteration count is retained. That is, if the
@@ -110,22 +110,22 @@ Task creation
     when disable was called, then if you enable it at a later time, the
     task will complete 4 more iterations.
 
--   _bool isEnabled();
+-   _bool isEnabled();_
 
 -   Test to see if the task is enabled. Returns true if enabled.
 
--   _void setCallback(const voidFuncType &);
+-   _void setCallback(const voidFuncType &);_
 
 -   Set a new function for the callback. This is best used after a reset
     but will work on an enabled task. The next iteration of the task
     will use the new callback.
 
--   _void runIt();
+-   _void runIt();_
 
 -   This is the function the scheduler uses to schedule the task, if
     needed. It shouldn't be called by the user's program.
 
--   _String getName();
+-   _String getName();_
 
 -   Return the name of the task in a String.
 
