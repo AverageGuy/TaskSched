@@ -3,7 +3,10 @@
 
 #include "Arduino.h"
 #include <list>
+#define TASK_SECOND 1000
+#define TASK_MINUTE 60
 using namespace std;
+
 
 typedef std::function<void(void)> voidFuncType;
 
@@ -21,32 +24,8 @@ typedef savedInitial initialState;
 class Task
 {
     public:
-        Task(const voidFuncType & func,  unsigned long interval=5000,
-                //Task(<void(*)()> func,unsigned long interval=5000,
-                bool enabled=false,
-                unsigned long iterations=0,
-                String name="Unk",
-                bool runImmediate=false)
-                : mProc(func){
-                    mRunImmediate=runImmediate;
-                    mInterval=interval;
-                    mEnabled=enabled;
-                    mIterations=iterations;
-                    mIterationCount=0;
-                    mOrig.mEnabled=enabled;
-                    mOrig.mInterval=interval;
-                    mOrig.mIterations=iterations;
-                    mOrig.mRunImmediate=runImmediate;
-                    mLastStartTime=millis();
-                    mName=name;
-#ifdef DEBUG
-                    Serial.printf("Stats for %s, interval = %ld, enabled = %d, iterations = %ls\n",name,interval,iterations);
-#endif
-                //mProc=func;
-                };
-                //    Task(*functionPtr)(),mInterval=5000,mEnabled=false,mIterations=0);
-
-    public:
+        Task(const voidFuncType & func,  unsigned long interval=5000, bool enabled=false, unsigned long iterations=0, String name="Unk", bool runImmediate=false);
+        Task(const voidFuncType & func,  double interval=5.0, bool enabled=false, unsigned long iterations=0, String name="Unk", bool runImmediate=false);
         bool isFirstIteration();
         bool isLastIteration();
         bool fRunImmediate();
@@ -61,6 +40,10 @@ class Task
         unsigned long mIterationCount;
         void setInterval(unsigned long newInterval);
         void setIterations(unsigned long newIterations);
+        String showTaskInfo();
+        unsigned long getInterval(void);
+        unsigned long getRunImmediate(void);
+        unsigned long getLastStartTime(void);
     private:
         bool mRunImmediate;
         bool doShow=true;
@@ -73,9 +56,10 @@ class Task
         unsigned long mIterations;
 };
 
-class Sked
+class Sched
 {
     public:
+        // sample setter and getter
         void set(unsigned long now)
         {
             test = now;
@@ -89,8 +73,32 @@ class Sked
         {
             return tTasks.size();
         }
+        String displayStatus(bool all=0) {
+            // all = true show status of all tasks, 
+            // all = false show status of enabled tasks only
+            static char printBuffer[1000]; // used to display status 
+                                           
+            char temp[100];
+            list<Task*>::iterator it;
+            sprintf(printBuffer,"");
+            int i=0;
+            for (it = tTasks.begin(); it != tTasks.end(); ++it){
+                Task *currentTask = *it;
+                unsigned long diff = millis() - currentTask->getLastStartTime();
+                if(!all && currentTask->isEnabled()) {
+                    sprintf(temp,"Task %s, Diff %lu, Interval %lu, RI %d\n",currentTask->getName(),diff,currentTask->getInterval(),currentTask->getRunImmediate());
+                }
+                if(all) {
+                    sprintf(temp,"Task %s, Diff %lu, Interval %lu, enabled %d, RI %d\n",currentTask->getName(),diff,currentTask->getInterval(),currentTask->isEnabled(),currentTask->getRunImmediate());
+                }
+                strcat(printBuffer,temp);
+                //currentTask->showInit();
+            }
+            String retStr(printBuffer);
+            return retStr;
+        }
 
-        Sked() {
+        Sched() {
         }
         void begin() {
             this->mEnabled=1;
