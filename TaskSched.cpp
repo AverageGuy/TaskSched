@@ -1,4 +1,46 @@
 #include "TaskSched.h"
+Task::Task(const voidFuncType & func,   long interval,
+        bool enabled,
+        unsigned long iterations,
+        String name,
+        bool runImmediate)
+        : mProc(func){
+        mRunImmediate=runImmediate;
+        mInterval=interval;
+        mEnabled=enabled;
+        mIterations=iterations;
+        mIterationCount=0;
+        mOrig.mEnabled=enabled;
+        mOrig.mInterval=interval;
+        mOrig.mIterations=iterations;
+        mOrig.mRunImmediate=runImmediate;
+        mLastStartTime=millis();
+        mName=name;
+#ifdef DEBUG
+        Serial.printf("Stats for %s, interval = %ld, enabled = %d, iterations = %ls\n",name,interval,iterations);
+#endif
+        };
+Task::Task(const voidFuncType & func,  int interval,
+        bool enabled,
+        unsigned long iterations,
+        String name,
+        bool runImmediate)
+        : mProc(func){
+        mRunImmediate=runImmediate;
+        mInterval=interval;
+        mEnabled=enabled;
+        mIterations=iterations;
+        mIterationCount=0;
+        mOrig.mEnabled=enabled;
+        mOrig.mInterval=interval;
+        mOrig.mIterations=iterations;
+        mOrig.mRunImmediate=runImmediate;
+        mLastStartTime=millis();
+        mName=name;
+#ifdef DEBUG
+        Serial.printf("Stats for %s, interval = %ld, enabled = %d, iterations = %ls\n",name,interval,iterations);
+#endif
+        };
 Task::Task(const voidFuncType & func,  unsigned long interval,
         bool enabled,
         unsigned long iterations,
@@ -113,21 +155,20 @@ String Task::formatMS(unsigned long milliseconds)
     return result;
 }
 
-String Task::showTaskInfo() {
+void Task::showTaskInfo() {
 
-                Task *currentTask = this;
-                unsigned long diff = millis() - currentTask->getLastStartTime();
-                String sDiff= currentTask->formatMS(diff);
-                String sInt= currentTask->formatMS(currentTask->getInterval());
-             //   Serial.printf("-- interval %ld %s %s\n",currentTask->getInterval(),sInt,sInt.c_str());
-                Serial.printf("%ld Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__LINE__,currentTask->getName(),currentTask->isEnabled(),sDiff.c_str(),sInt.c_str(),currentTask->getRunImmediate());
-//    sprintf(buf,"RunIt called %ld, Enabled: %d, Immediate: %d, Interval: %ld, Iter: %ld, IterCnt: %ld, Name: %s\n",mRunItCalled,mEnabled, mRunImmediate, mInterval, mIterations, mIterationCount,mName);
-//    Serial.println(buf);
+    Task *currentTask = this;
+    unsigned long diff = millis() - currentTask->getLastStartTime();
+    String sDiff= currentTask->formatMS(diff);
+    String sInt= currentTask->formatMS(currentTask->getInterval());
+    //   Serial.printf("-- interval %ld %s %s\n",currentTask->getInterval(),sInt,sInt.c_str());
+    Serial.printf("%ld Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__LINE__,currentTask->getName(),currentTask->isEnabled(),sDiff.c_str(),sInt.c_str(),currentTask->getRunImmediate());
+    //    sprintf(buf,"RunIt called %ld, Enabled: %d, Immediate: %d, Interval: %ld, Iter: %ld, IterCnt: %ld, Name: %s\n",mRunItCalled,mEnabled, mRunImmediate, mInterval, mIterations, mIterationCount,mName);
+    //    Serial.println(buf);
     if(passedInterval >0) {
         Serial.printf("For float interval passed in %f, mInterval became %ld\n",passedInterval,mInterval);
     }
-    String ret(buf);
-    return ret;
+    return;
 }
 
 bool Task::isEnabled() {

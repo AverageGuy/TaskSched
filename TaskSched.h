@@ -24,6 +24,8 @@ typedef savedInitial initialState;
 class Task
 {
     public:
+        Task(const voidFuncType & func,  int interval=5000, bool enabled=false, unsigned long iterations=0, String name="Unk", bool runImmediate=false);
+        Task(const voidFuncType & func,  long interval=5000, bool enabled=false, unsigned long iterations=0, String name="Unk", bool runImmediate=false);
         Task(const voidFuncType & func,  unsigned long interval=5000, bool enabled=false, unsigned long iterations=0, String name="Unk", bool runImmediate=false);
         Task(const voidFuncType & func,  double interval=5.0, bool enabled=false, unsigned long iterations=0, String name="Unk", bool runImmediate=false);
         // interval is in seconds for float and ms for long
@@ -42,7 +44,7 @@ class Task
         void setInterval(unsigned long newInterval);
         void setIterations(unsigned long newIterations);
         void setImmediate(bool);
-        String showTaskInfo();
+        void showTaskInfo();
         unsigned long getInterval(void);
         unsigned long getRunImmediate(void);
         unsigned long getLastStartTime(void);
