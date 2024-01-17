@@ -70,39 +70,39 @@ class Task {
     public:
         Task(void (*func)(Task*) , double interval = 5.0, bool enabled = false,  
                 int iterations = 0, String name = "Unk", bool runImmediately = false) 
-    {
-             mProc=func;
-            mInt=static_cast<int>(interval);
+        {
+            mProc=func;
+            mIntI=static_cast<int>(interval);
             mInterval=static_cast<int>(interval*1000);
             mEnabled=enabled; 
             mIterations=iterations; 
             mName=name; 
             mRunImmediately=runImmediately;
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-    }
+            mOrig.mEnabled=enabled;
+            mOrig.mInterval=mInterval;
+            mOrig.mIterations=iterations;
+            mOrig.mRunImmediately=runImmediately;
+            mLastStartTime=millis();
+        }
      //   Task(const Task& func
         Task(void (*func)(Task*) , int interval = 5000, bool enabled = false,  
                 int iterations = 0, String name = "Unk", bool runImmediately = false) 
-    {
-             mProc=func;
-            mInt=interval;
+        {
+            mProc=func;
+            mIntI=interval;
             mInterval=interval;
             mEnabled=enabled; 
             mIterations=iterations; 
             mName=name; 
             mRunImmediately=runImmediately;
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-    };
+            mOrig.mEnabled=enabled;
+            mOrig.mInterval=interval;
+            mOrig.mIterations=iterations;
+            mOrig.mRunImmediately=runImmediately;
+            mLastStartTime=millis();
+        };
     public:
-        int mInt;
+        int mIntI;
         /** return true if this is the first iteration */
         bool isFirstIteration();
         /** return true if this is the last iteration */
@@ -176,7 +176,7 @@ Source:
     Serial.print(str);
 ```
          * */
-        String displayStatus(int num,String taskName="");
+        String displayStatus(int num,String taskName="",bool raw=false);
         /** default constructor */
         Sched();
         /** used to start the scheduling. A call to begin will also enable the scheduler. 

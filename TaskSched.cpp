@@ -407,7 +407,7 @@ unsigned long Sched::getSize()
     *
     * if taskName != "" ignore num setting
     */
-String Sched::displayStatus(int num,String taskName) {
+String Sched::displayStatus(int num,String taskName,bool raw) {
     static char printBuffer[1000]; // used to display status 
 
     char temp[1000];
@@ -419,7 +419,14 @@ String Sched::displayStatus(int num,String taskName) {
         Task *currentTask = *it;
         unsigned long diff = millis() - currentTask->getLastStartTime();
         String sDiff= currentTask->formatMS(diff);
-        String sInt= currentTask->formatMS(currentTask->getInterval());
+        char sint[32];
+        if(raw) {
+            sprintf(sint,"%d",  currentTask->getInterval());
+        } else {
+            String sIntx= currentTask->formatMS(currentTask->getInterval());
+            strcpy(sint,sIntx.c_str());
+        }
+        String sInt(sint);
         if(taskName!="") {
             String name = currentTask->getName();
             if(taskName == name) {
