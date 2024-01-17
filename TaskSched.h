@@ -1,7 +1,6 @@
 #ifndef TASKSCHED_H
 #define TASKSCHED_H
 
-
 #define DEBUGA 1
 #include "Arduino.h"
 #include <list>
