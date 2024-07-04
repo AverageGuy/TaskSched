@@ -3,214 +3,42 @@
 #ifdef DEBUG
 #include "esp_debug_helpers.h"
 #endif
-/*
-Task::Task(const voidFuncType & func,   
-        int interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-{
-    mWith(false);
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
 
-#ifdef DEBUG
-        Serial.printf("long constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-Task::Task(const voidFuncTypeWith & func,   int interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
+Task::Task(TaskCallback func, double interval, bool enabled, int iterations, const char* name, bool runImmediately)
+    : mProcWithTask(func), mProcVoid(nullptr), mWithTaskPtr(true)
 {
-    mWith(true);
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
+    // Initialize other members...
+            //mProc=func;
+            mIntI=static_cast<int>(interval);
+            mInterval=static_cast<int>(interval*1000);
+            mEnabled=enabled; 
+            mIterations=iterations; 
+            mName=name; 
+            mRunImmediately=runImmediately;
+            mOrig.mEnabled=enabled;
+            mOrig.mInterval=mInterval;
+            mOrig.mIterations=iterations;
+            mOrig.mRunImmediately=runImmediately;
+            mLastStartTime=millis();
+}
 
-#ifdef DEBUG
-        Serial.printf("long constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-Task::Task(const voidFuncType & func, 
-        int interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-    : mProc(func),
-
-        mIterationCount(0),
-        mLastStartTime(millis()),
-        mRunImmediately(runImmediately),
-        mInterval(interval),
-        mEnabled(enabled),
-        mIterations(iterations),
-        mName(name),
-        mWith(false)
+Task::Task(VoidCallback func, double interval, bool enabled, int iterations, const char* name, bool runImmediately)
+    : mProcWithTask(nullptr), mProcVoid(func), mWithTaskPtr(false)
 {
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-#ifdef DEBUG
-        Serial.printf("int constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-Task::Task(const voidFuncTypeWith & func,  int interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-    : mProcW(func),
-        mIterationCount(0),
-        mLastStartTime(millis()),
-        mRunImmediately(runImmediately),
-        mInterval(interval),
-        mEnabled(enabled),
-        mIterations(iterations),
-        mName(name),
-        mWith(true)
-{
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-#ifdef DEBUG
-        Serial.printf("int constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-Task::Task(const voidFuncType & func,  unsigned long interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-    : mProc(func),
-        mIterationCount(0),
-        mLastStartTime(millis()),
-        mRunImmediately(runImmediately),
-        mInterval(interval),
-        mEnabled(enabled),
-        mIterations(iterations),
-        mName(name),
-        mWith(false)
-{
-#ifdef DEBUG
-        Serial.printf("For long interval passed in %ld, mInterval became %ld\n",interval,mInterval);
-#endif
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-#ifdef DEBUG
-        Serial.printf("%s instantiated\n",name.c_str());
-        Serial.printf("ulong constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-
-Task::Task(const voidFuncTypeWith & func,  unsigned long interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-    : mProcW(func),
-        mIterationCount(0),
-        mLastStartTime(millis()),
-        mRunImmediately(runImmediately),
-        mInterval(interval),
-        mEnabled(enabled),
-        mIterations(iterations),
-        mName(name),
-        mWith(true)
-{
-#ifdef DEBUG
-        Serial.printf("For long interval passed in %ld, mInterval became %ld\n",interval,mInterval);
-#endif
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-#ifdef DEBUG
-        Serial.printf("%s instantiated\n",name.c_str());
-        Serial.printf("ulong constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-
-Task::Task(const voidFuncType & func,  double interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-    : mProc(func),
-        mIterationCount(0),
-        mLastStartTime(millis()),
-        mRunImmediately(runImmediately),
-        mInterval((long)(interval*TASK_SECOND)),
-        mEnabled(enabled),
-        mIterations(iterations),
-        mName(name),
-        mWith(false)
-{
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-#ifdef DEBUG
-        Serial.printf("%s instantiated\n",name.c_str());
-        Serial.printf("double constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-    };
-
-Task::Task(const voidFuncTypeWith & func,  double interval,
-        bool enabled,
-        unsigned long iterations,
-        String name,
-        bool runImmediately)
-    : mProcW(func),
-        mIterationCount(0),
-        mLastStartTime(millis()),
-        mRunImmediately(runImmediately),
-        mInterval((long)(interval*TASK_SECOND)),
-        mEnabled(enabled),
-        mIterations(iterations),
-        mName(name),
-        mWith(true)
-{
-        mOrig.mEnabled=enabled;
-        mOrig.mInterval=interval;
-        mOrig.mIterations=iterations;
-        mOrig.mRunImmediately=runImmediately;
-        mLastStartTime=millis();
-        //Serial.println("Befoe call");
-        //mProc();
-        //Serial.println("After call");
-#ifdef DEBUG
-        Serial.printf("%s instantiated\n",name.c_str());
-        Serial.printf("double constructor for %s called\n",name);
-        Serial.printf("%d: Stats for %s, interval = %ld, enabled = %d, iterations = %ld\n",__LINE__,name,interval,enabled,iterations);
-#endif
-        //mProc=func;
-    };
-*/
-//    Task(*functionPtr)(),mInterval=5000,mEnabled=false,mIterations=0);
-
+    // Initialize other members...
+            //mProc=func;
+            mIntI=interval;
+            mInterval=interval;
+            mEnabled=enabled; 
+            mIterations=iterations; 
+            mName=name; 
+            mRunImmediately=runImmediately;
+            mOrig.mEnabled=enabled;
+            mOrig.mInterval=interval;
+            mOrig.mIterations=iterations;
+            mOrig.mRunImmediately=runImmediately;
+            mLastStartTime=millis();
+}
 
 bool Task::isFirstIteration() {
     if(mIterationCount == 0) {
@@ -318,8 +146,14 @@ void Task::restart() {
     return;
 }
 
-void Task::setCallback(const voidFuncTypeWith & func) {
-    mProc=func;
+void Task::setCallback(const VoidCallback & func) {
+    //mProc=func;
+    mProcVoid=func;
+}
+
+void Task::setCallback(const TaskCallback & func) {
+    //mProc=func;
+    mProcWithTask=func;
 }
 
 void Task::setName(String newName) {
@@ -360,24 +194,26 @@ unsigned long Task::getIterationCount()
 {
     return mIterationCount;
 }
-
-void  Task::runIt() {
-#ifdef DEBUG
-    Serial.printf("%s %d %s called for runIt\n",__FILE__,__LINE__,mName.c_str());
-#endif
-    if(!isEnabled()) {
+void Task::runIt() {
+    if (!isEnabled()) {
         return;
     }
 
-    if((mRunImmediately && mIterationCount == 0) || (millis() - mLastStartTime) > mInterval){
-        mRunImmediately=false; // don't do it again
+    if ((mRunImmediately && mIterationCount == 0) || (millis() - mLastStartTime) > mInterval) {
+        mRunImmediately = false;
+
         unsigned long diff = millis() - getLastStartTime();
         String sDiff= formatMS(diff);
         String sInt= formatMS(getInterval());
 #ifdef DEBUG
         Serial.printf("%s %d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__FILE__,__LINE__,getName().c_str().c_str(),isEnabled(),sDiff.c_str(),sInt.c_str(),getRunImmediately());
 #endif
-        mProc(this);
+        if (mWithTaskPtr && mProcWithTask) {
+            mProcWithTask(this);
+        } else if (!mWithTaskPtr && mProcVoid) {
+            mProcVoid();
+        }
+
         ++(mIterationCount);
 #ifdef DEBUG
         Serial.printf("%s %d %s in runit iteration count is %ld, max is %ld\n",__FILE__,__LINE__,getName().c_str(),mIterationCount,mIterations);

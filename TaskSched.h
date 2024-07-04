@@ -4,7 +4,6 @@
 #define DEBUGA 1
 #include "Arduino.h"
 #include <list>
-#include <functional>
 #define TASK_SECOND 1000
 #define TASK_MINUTE 60*TASK_SECOND
 
@@ -55,8 +54,17 @@ Output:
 @endcode
 */
 class Task {
-    private:
-        voidFuncTypeWith mProc;
+
+    public:
+    // Function pointer types
+    typedef void (*TaskCallback)(Task*);
+    typedef void (*VoidCallback)();
+private:
+    TaskCallback mProcWithTask;
+    VoidCallback mProcVoid;
+    bool mWithTaskPtr;
+
+//        voidFuncTypeWith mProc;
         long mInterval;
         bool mEnabled;
         unsigned long mIterations;
@@ -68,39 +76,14 @@ class Task {
         savedInitial mOrig;
         double passedInterval=-1.0;
     public:
-        Task(void (*func)(Task*) , double interval = 5.0, bool enabled = false,  
-                int iterations = 0, String name = "Unk", bool runImmediately = false) 
-        {
-            mProc=func;
-            mIntI=static_cast<int>(interval);
-            mInterval=static_cast<int>(interval*1000);
-            mEnabled=enabled; 
-            mIterations=iterations; 
-            mName=name; 
-            mRunImmediately=runImmediately;
-            mOrig.mEnabled=enabled;
-            mOrig.mInterval=mInterval;
-            mOrig.mIterations=iterations;
-            mOrig.mRunImmediately=runImmediately;
-            mLastStartTime=millis();
-        }
-     //   Task(const Task& func
-        Task(void (*func)(Task*) , int interval = 5000, bool enabled = false,  
-                int iterations = 0, String name = "Unk", bool runImmediately = false) 
-        {
-            mProc=func;
-            mIntI=interval;
-            mInterval=interval;
-            mEnabled=enabled; 
-            mIterations=iterations; 
-            mName=name; 
-            mRunImmediately=runImmediately;
-            mOrig.mEnabled=enabled;
-            mOrig.mInterval=interval;
-            mOrig.mIterations=iterations;
-            mOrig.mRunImmediately=runImmediately;
-            mLastStartTime=millis();
-        };
+    // Constructor for callback with Task pointer
+    Task(TaskCallback func, double interval = 5.0, bool enabled = false,
+         int iterations = 0, const char* name = "Unk", bool runImmediately = false);
+
+    // Constructor for callback without Task pointer
+    Task(VoidCallback func, double interval = 5.0, bool enabled = false,
+         int iterations = 0, const char* name = "Unk", bool runImmediately = false);
+    
     public:
         int mIntI;
         /** return true if this is the first iteration */
@@ -118,7 +101,8 @@ class Task {
         /** return true if task is enabled */
         bool isEnabled();
         /** assign a new callback */
-        void setCallback(const voidFuncTypeWith &);
+        void setCallback(const TaskCallback &);
+        void setCallback(const VoidCallback &);
         /** give the task a new name */
         void setName(String);
         /** function used by the schedule to run this task, shouldn't be called by user */
@@ -213,7 +197,7 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
         void run();
 
     private:
-        std::list<Task *> tTasks;
+        std::list<Task*> tTasks;
         int mSchedEnabled;
 };
 
