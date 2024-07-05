@@ -235,7 +235,7 @@ void Task::runIt() {
 
 unsigned long Sched::getSize()
 {
-    return tTasks.size();
+    return tTasks.get_size();
 }
     /** num = true show status of num tasks, 
      *
@@ -248,7 +248,7 @@ String Sched::displayStatus(int num,String taskName,bool raw) {
 
     char temp[1000];
     strcpy(temp,"");
-    std::list<Task*>::iterator it;
+    SimpleList<Task*>::iterator it;
     sprintf(printBuffer,"%s","");
     int cnt=0;
     for (it = tTasks.begin(); it != tTasks.end(); ++it){
@@ -307,7 +307,7 @@ void Sched::addTask(Task *task)
 #ifdef DEBUG
     Serial.printf("add called for task, %s %x\n",task->getName().c_str(),task);
 #endif
-    tTasks.push_front(task);
+    tTasks.push_back(task);
     return;
 };
 
@@ -329,7 +329,7 @@ void Sched::run()
 #ifdef DEBUG
         //                Serial.println("Looking for tasks");
 #endif
-        std::list<Task*>::iterator it;
+        SimpleList<Task*>::iterator it;
         for (it = tTasks.begin(); it != tTasks.end(); ++it){
             Task *currentTask = *it;
 #ifdef DEBUGR
@@ -347,7 +347,7 @@ void Sched::run()
     }
 }
 
-const std::list<Task *>& Sched::getTasks() const
+const SimpleList<Task *>& Sched::getTasks() const
 {
     return tTasks;
 }

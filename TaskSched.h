@@ -3,12 +3,14 @@
 
 #define DEBUGA 1
 #include "Arduino.h"
-#include <list>
+//#include <list>
 #define TASK_SECOND 1000
 #define TASK_MINUTE 60*TASK_SECOND
 
+#include "SimpleList.h"
+
+
 class Task;
-using voidFuncTypeWith = std::function<void(Task *)>;
 // was typedef std::function<void(Task *)> voidFuncTypeWith;
 
 class InitialState {
@@ -192,12 +194,13 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
         /** return true if the scheduler is enabled */
         int isEnabled();
         /** returns a list of the tasks */
-        const std::list<Task *>& getTasks() const;
+        //const std::list<Task *>& getTasks() const;
+        const SimpleList<Task *>& getTasks() const;
         /** called perodically to check if a task should be scheduled */
         void run();
 
     private:
-        std::list<Task*> tTasks;
+        SimpleList<Task*> tTasks;
         int mSchedEnabled;
 };
 
