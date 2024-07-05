@@ -1,199 +1,48 @@
-//#define DEBUG 1
 #include "TaskSched.h"
-#ifdef DEBUG
-#include "esp_debug_helpers.h"
-#endif
 
-Task::Task(TaskCallback func, double interval, bool enabled, int iterations, const char* name, bool runImmediately)
-    : mProcWithTask(func), mProcVoid(nullptr), mWithTaskPtr(true)
-{
-    // Initialize other members...
-            //mProc=func;
-            mIntI=static_cast<int>(interval);
-            mInterval=static_cast<int>(interval*1000);
-            mEnabled=enabled; 
-            mIterations=iterations; 
-            mName=name; 
-            mRunImmediately=runImmediately;
-            mOrig.mEnabled=enabled;
-            mOrig.mInterval=mInterval;
-            mOrig.mIterations=iterations;
-            mOrig.mRunImmediately=runImmediately;
-            mLastStartTime=millis();
-}
-
-Task::Task(VoidCallback func, double interval, bool enabled, int iterations, const char* name, bool runImmediately)
-    : mProcWithTask(nullptr), mProcVoid(func), mWithTaskPtr(false)
-{
-    // Initialize other members...
-            //mProc=func;
-            mIntI=interval;
-            mInterval=interval;
-            mEnabled=enabled; 
-            mIterations=iterations; 
-            mName=name; 
-            mRunImmediately=runImmediately;
-            mOrig.mEnabled=enabled;
-            mOrig.mInterval=interval;
-            mOrig.mIterations=iterations;
-            mOrig.mRunImmediately=runImmediately;
-            mLastStartTime=millis();
-}
-
+/**
+ * @brief Check if this is the first iteration of the task.
+ * @return bool True if it's the first iteration, false otherwise.
+ */
 bool Task::isFirstIteration() {
-    if(mIterationCount == 0) {
-        return true;
-    }
-    return false;
+    return mIterationCount == 0;
 }
 
-String Task::getName()
-{
+/**
+ * @brief Get the name of the task.
+ * @return String The name of the task.
+ */
+String Task::getName() {
     return mName;
 }
 
+/**
+ * @brief Check if this is the last iteration of the task.
+ * @return bool True if it's the last iteration, false otherwise.
+ */
 bool Task::isLastIteration() {
-    if(mIterations ==0) {
+    if (mIterations == 0) {
         return false;
     }
-    if(mIterationCount >=mIterations) {
-        return true;
-    }
-    return false;
+    return mIterationCount >= mIterations;
 }
 
+/**
+ * @brief Disable the task.
+ */
 void Task::disable() {
-    mEnabled=false;
-    mIterationCount=0;
-    return;
+    mEnabled = false;
+    mIterationCount = 0;
 }
 
-void Task::showInit() {
-    if(!doShow) {
-        return;
-    }
-    doShow=false; // only do it once
-#ifdef DEBUG
+// ... (other method implementations)
 
-    String res;
-    res = formatMS(mInterval);
-    Serial.printf("%s %d showInit: Name: %s, interval: %s, enabled:%d, iterations:%ld %x\n",
-            __FILE__,__LINE__,mName,res,mEnabled,mIterations,this);
-#endif
-
-    return;
-}
-
-String Task::formatMS(unsigned long milliseconds){
-
-    int minutes = milliseconds / 60000;
-    int seconds = (milliseconds % 60000) / 1000; 
-    int ms = (milliseconds % 1000);
-
-    char res[20];
-    sprintf(res, "%02d:%02d.%03d", minutes, seconds, ms);
-#ifdef DEBUG
-    esp_backtrace_print(2);
-    Serial.printf("%s %d %s\n",__FILE__,__LINE__,res);
-#endif
-
-    return String(res); 
-}
-
-String Task::showTaskInfo() {
-
-    char buf[200];
-    unsigned long diff = millis() - getLastStartTime();
-    String sDiff= formatMS(diff);
-    String sInt= formatMS(getInterval());
-#ifdef DEBUG
-    Serial.printf("%s %d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__FILE__,__LINE__,this->getName().c_str(),isEnabled(),sDiff.c_str(),sInt.c_str(),getRunImmediately());
-    if(passedInterval >0) {
-        Serial.printf("For float interval passed in %f, mInterval became %ld\n",passedInterval,mInterval);
-    }
-#else
-    sprintf(buf,"Task %s, Enabled? %d, Diff %s, Interval %s, RunIm %d\n",this->getName().c_str(),isEnabled(),sDiff.c_str(),sInt.c_str(),getRunImmediately());
-    String ret(buf);
-    return ret;
-
-#endif
-
-    return "";
-}
-
-bool Task::isEnabled() {
-    return mEnabled;
-}
-
-void Task::enable() {
-    mEnabled=true;
-    mLastStartTime=millis();
-#ifdef DEBUG
-    Serial.printf("Enabling %s\n",mName.c_str());
-#endif
-    return;
-}
-
-void Task::restart() {
-    mInterval=mOrig.mInterval;
-    mIterations=mOrig.mIterations;
-    mEnabled=false;
-    mIterationCount=0;
-    mRunImmediately=mOrig.mRunImmediately;
-#ifdef DEBUG
-    Serial.printf("Restarting %s\n",mName.c_str());
-#endif
-    return;
-}
-
-void Task::setCallback(const VoidCallback & func) {
-    //mProc=func;
-    mProcVoid=func;
-}
-
-void Task::setCallback(const TaskCallback & func) {
-    //mProc=func;
-    mProcWithTask=func;
-}
-
-void Task::setName(String newName) {
-    mName=newName;
-}
-
-void Task::setImmediately(bool newImmediately)
-{
-    mRunImmediately = newImmediately;
-}
-
-void Task::setIterations(unsigned long newIterations)
-{
-    mIterations = newIterations;
-}
-
-void Task::setInterval(unsigned long newInterval)
-{
-    mInterval = newInterval;
-}
-
-bool Task::getRunImmediately(void)
-{
-    return mRunImmediately;
-}
-
-unsigned long Task::getInterval(void)
-{
-    return mInterval;
-}
-
-unsigned long Task::getLastStartTime(void)
-{
-    return mLastStartTime;
-}
-
-unsigned long Task::getIterationCount() 
-{
-    return mIterationCount;
-}
+/**
+ * @brief Run the task if conditions are met.
+ * 
+ * This method checks if the task should be run based on its interval
+ * and other conditions, and executes the task's callback if so.
+ */
 void Task::runIt() {
     if (!isEnabled()) {
         return;
@@ -203,154 +52,60 @@ void Task::runIt() {
         mRunImmediately = false;
 
         unsigned long diff = millis() - getLastStartTime();
-        String sDiff= formatMS(diff);
-        String sInt= formatMS(getInterval());
-#ifdef DEBUG
-        Serial.printf("%s %d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__FILE__,__LINE__,getName().c_str().c_str(),isEnabled(),sDiff.c_str(),sInt.c_str(),getRunImmediately());
-#endif
-        if (mWithTaskPtr && mProcWithTask) {
+        String sDiff = formatMS(diff);
+        String sInt = formatMS(getInterval());
+        #ifdef DEBUG
+        Serial.printf("%s %d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",
+                      __FILE__, __LINE__, getName().c_str(), isEnabled(),
+                      sDiff.c_str(), sInt.c_str(), getRunImmediately());
+        #endif
+
+        if (mProcWithTask) {
             mProcWithTask(this);
-        } else if (!mWithTaskPtr && mProcVoid) {
-            mProcVoid();
         }
 
-        ++(mIterationCount);
-#ifdef DEBUG
-        Serial.printf("%s %d %s in runit iteration count is %ld, max is %ld\n",__FILE__,__LINE__,getName().c_str(),mIterationCount,mIterations);
-#endif
-        if(mIterationCount>mIterations && mIterations != 0) {
-#ifdef DEBUG
-            Serial.printf("Iterations exhaused for %s, diabling\n",getName()).c_str();
-#endif
+        ++mIterationCount;
+        #ifdef DEBUG
+        Serial.printf("%s %d %s in runIt iteration count is %ld, max is %ld\n",
+                      __FILE__, __LINE__, getName().c_str(), mIterationCount, mIterations);
+        #endif
+
+        if (mIterationCount > mIterations && mIterations != 0) {
+            #ifdef DEBUG
+            Serial.printf("Iterations exhausted for %s, disabling\n", getName().c_str());
+            #endif
             disable();
         } else {
-            mLastStartTime=millis();
-        }
-#ifdef DEBUG
-        //        Serial.printf("%s in runit count is %ld\n",getName(),mIterationCount);
-#endif
-    }
-
-}
-
-unsigned long Sched::getSize()
-{
-    return tTasks.get_size();
-}
-    /** num = true show status of num tasks, 
-     *
-    * num = 0 show status of enabled tasks only
-    *
-    * if taskName != "" ignore num setting
-    */
-String Sched::displayStatus(int num,String taskName,bool raw) {
-    static char printBuffer[1000]; // used to display status 
-
-    char temp[1000];
-    strcpy(temp,"");
-    SimpleList<SafePtr<Task>>::iterator it;  // Changed from SimpleList<Task*>::iterator
-    sprintf(printBuffer,"%s","");
-    int cnt=0;
-    for (it = tTasks.begin(); it != tTasks.end(); ++it){
-        SafePtr<Task>& currentTask = *it;
-        unsigned long diff = millis() - currentTask->getLastStartTime();
-        String sDiff= currentTask->formatMS(diff);
-        char sint[32];
-        if(raw) {
-            sprintf(sint,"%d",  currentTask->getInterval());
-        } else {
-            String sIntx= currentTask->formatMS(currentTask->getInterval());
-            strcpy(sint,sIntx.c_str());
-        }
-        String sInt(sint);
-        if(taskName!="") {
-            String name = currentTask->getName();
-            if(taskName == name) {
-                sprintf(temp,"%d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",cnt,currentTask->getName().c_str(),currentTask->isEnabled(),sDiff.c_str(),sInt.c_str(),currentTask->getRunImmediately());
-                strcat(printBuffer,temp);
-            }
-        } else if(!num && currentTask->isEnabled()) {
-            if(!currentTask->isEnabled()) {
-                //         Serial.printf("Skip %x\n",currentTask);
-                continue;
-            }
-            //                    sprintf(temp,"Task %s, Enabled? %d Diff %s, Interval %s, RI %d\n",currentTask->getName(),currentTask->isEnabled(),sDiff,sInt,currentTask->getRunImmediately());
-            cnt++;
-            sprintf(temp,"%d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",cnt,currentTask->getName().c_str(),currentTask->isEnabled(),sDiff.c_str(),sInt.c_str(),currentTask->getRunImmediately());
-            //    Serial.printf("  Temp %s\n",temp);
-            //   Serial.printf("%ld dif %s\n",__LINE__, sDiff.c_str());
-            strcat(printBuffer,temp);
-        } else if(num) {
-            if(cnt>num) {
-                break;
-            }
-            sprintf(temp,"Task %9s,  Enabled? %d, Diff %s, Interval %s, RI %d\n", currentTask->getName().c_str(), currentTask->isEnabled(),sDiff.c_str(),sInt.c_str(),currentTask->getRunImmediately());
-            //sprintf(temp,"Task %s, Diff %lu, Interval %lu, enabled %d, RI %d\n",currentTask->getName(),diff,currentTask->getInterval(),currentTask->isEnabled(),currentTask->getRunImmediately());
-            //                    Serial.printf("%ld dif %s\n",__LINE__, sDiff.c_str());
-            if(strlen(temp)+strlen(printBuffer)<999) {
-                strcat(printBuffer,temp);
-            }
+            mLastStartTime = millis();
         }
     }
-    String retStr(printBuffer);
-    return retStr;
 }
 
-Sched::Sched() {
-}
+// ... (Sched method implementations)
 
-void Sched::begin() {
-    this->mSchedEnabled=1;
-}
-void Sched::addTask(SafePtr<Task> task)
-{
-#ifdef DEBUG
-    Serial.printf("add called for task, %s %x\n",task->getName().c_str(),task);
-#endif
-    tTasks.push_back(task);
-    return;
-};
-
-void Sched::enable() {
-    this->mSchedEnabled=1;
-}
-void Sched::disable() {
-    this->mSchedEnabled=0;
-}
-int Sched::isEnabled() {
-    return this->mSchedEnabled;
-}
-
-int ckCnt=0;
-
-void Sched::run()
-{
-    if(this->mSchedEnabled) {
-#ifdef DEBUG
-        //                Serial.println("Looking for tasks");
-#endif
-//        SimpleList<SafePtr<Task> task>::iterator it;
+/**
+ * @brief Run the scheduler.
+ * 
+ * This method iterates through all tasks and runs them if they are enabled.
+ */
+void Sched::run() {
+    if (this->mSchedEnabled) {
         for (auto it = tTasks.begin(); it != tTasks.end(); ++it) {
- //       for (it = tTasks.begin(); it != tTasks.end(); ++it){
             SafePtr<Task>& currentTask = *it;
-
-#ifdef DEBUGR
-            Serial.printf("%s %d task=%x i=%d millis()=%ld Found name=%s, Is enabled? %d\n",__FILE__,__LINE__,currentTask,i++,millis(),currentTask->getName().c_str(),currentTask->isEnabled());
-            currentTask->showInit();
-#endif
-            if(currentTask->isEnabled()) {
+            if (currentTask->isEnabled()) {
                 currentTask->runIt(); 
             }
         }
     } else {
-#ifdef DEBUG
+        #ifdef DEBUG
         Serial.println("Not enabled");
-#endif
+        #endif
     }
 }
 
-const SimpleList<SafePtr<Task>>& Sched::getTasks() const
-{
-    return tTasks;
-}
-
+// Explicit instantiations for common types
+template Task::Task<float>(Task::TaskCallback, float, bool, int, const char*, bool);
+template Task::Task<double>(Task::TaskCallback, double, bool, int, const char*, bool);
+template Task::Task<int>(Task::TaskCallback, int, bool, int, const char*, bool);
+template Task::Task<long>(Task::TaskCallback, long, bool, int, const char*, bool);
+template Task::Task<unsigned long>(Task::TaskCallback, unsigned long, bool, int, const char*, bool);

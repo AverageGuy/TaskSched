@@ -16,7 +16,7 @@
 
 //int ledPin = LED_BUILTIN;
 int ledPin = 13; // this worked for my ttgo esp32
-void turnLedOn();
+void turnLedOn(Task*);
 void turnLedOff(Task*);
 
 Sched scheduler; 
@@ -28,7 +28,7 @@ SafePtr<Task> t3;
 //  Task* t1 = new Task(turnLedOn, 2000, true, 20, "OnTask", true);
 //  Task* t2 = new Task(turnLedOff, 1000, true, 20, "OffTask",false); 
 
-void turnLedOn() {
+void turnLedOn(Task *tsk) {
   digitalWrite(ledPin, HIGH); 
   Serial.print("T1 interval =");
   Serial.println(t1->getInterval());
@@ -39,6 +39,18 @@ void turnLedOn() {
   Serial.println("Turn on");
 }
 
+void turnLedOnx() {
+  Serial.print("T1 interval =");
+  Serial.println(t1->getInterval());
+  Serial.print("T2 interval =");
+  Serial.println(t2->getInterval());
+  Serial.print("T3 interval =");
+  Serial.println(t3->getInterval());
+  Serial.println("Turn on");
+}
+
+void turnLed(Task *tsk) {
+}
 void turnLedOff(Task *tsk) {
   digitalWrite(ledPin, LOW);  
   t2->setInterval(2000);
@@ -55,20 +67,23 @@ void setup() {
   ledPin = 16; // this worked for my 
     Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
-  t3 = SafePtr<Task>(new Task(turnLedOn, 2000L, true, 20, "OnTask", true));
+  t3 = SafePtr<Task>(new Task(turnLed, 5.0, true, 20, "OnTask", true));
   t1 = SafePtr<Task>(new Task(turnLedOn, 2000L, true, 20, "OnTask", true));
   t2 = SafePtr<Task>(new Task(turnLedOff, 1000L, true, 20, "OffTask", false));
-  delay(500);
-  Serial.println("Starting");
-turnLedOn() ;
-
+  scheduler.addTask(t3);
   scheduler.addTask(t1);
   scheduler.addTask(t2);
-turnLedOn() ;
+  Serial.println("Starting");
+  String str = scheduler.displayStatus(true);
+  delay(500);
+  Serial.print(str);
+turnLedOnx( ) ;
+
+turnLedOnx() ;
   
   scheduler.begin();
-turnLedOn() ;
-  String str = scheduler.displayStatus(true);
+turnLedOnx() ;
+  str = scheduler.displayStatus(true);
   Serial.print(str);
 
   start=millis();
