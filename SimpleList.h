@@ -1,11 +1,13 @@
 #ifndef SIMPLE_LIST_H
 #define SIMPLE_LIST_H
 
+#include "SafePtr.h"
+
 template<typename T>
 class SimpleList {
 private:
     struct Node {
-        T data;
+        T data;  // This will now be SafePtr<Task>
         Node* next;
         
         Node(const T& value) : data(value), next(nullptr) {}
@@ -50,13 +52,13 @@ public:
         }
     }
 
-    T* read() {
+    T read() {
         if (read_position) {
-            T* value = &(read_position->data);
+            T value = read_position->data;
             read_position = read_position->next;
             return value;
         }
-        return nullptr;
+        return T();  // Return empty SafePtr<Task>
     }
 
     void rewind() {
@@ -83,22 +85,22 @@ public:
     }
 
     class iterator {
-        private:
-            Node* current;
-        public:
-            iterator() : current(nullptr) {}  // Add this line: default constructor
-            iterator(Node* node) : current(node) {}
-
-            T& operator*() { return current->data; }
-            T* operator->() { return &current->data; }
-            iterator& operator++() { if (current) current = current->next; return *this; }
-            bool operator!=(const iterator& other) const { return current != other.current; }
-            bool operator==(const iterator& other) const { return current == other.current; }
+    private:
+        Node* current;
+    public:
+        iterator() : current(nullptr) {}
+        iterator(Node* node) : current(node) {}
+        
+        T& operator*() { return current->data; }
+        T* operator->() { return &current->data; }
+        iterator& operator++() { if (current) current = current->next; return *this; }
+        bool operator!=(const iterator& other) const { return current != other.current; }
+        bool operator==(const iterator& other) const { return current == other.current; }
     };
 
-    // Add these methods to the SimpleList class if they're not already present
     iterator begin() { return iterator(head); }
     iterator end() { return iterator(nullptr); }
 };
 
 #endif // SIMPLE_LIST_H
+

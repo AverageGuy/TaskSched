@@ -248,11 +248,11 @@ String Sched::displayStatus(int num,String taskName,bool raw) {
 
     char temp[1000];
     strcpy(temp,"");
-    SimpleList<Task*>::iterator it;
+    SimpleList<SafePtr<Task>>::iterator it;  // Changed from SimpleList<Task*>::iterator
     sprintf(printBuffer,"%s","");
     int cnt=0;
     for (it = tTasks.begin(); it != tTasks.end(); ++it){
-        Task *currentTask = *it;
+        SafePtr<Task>& currentTask = *it;
         unsigned long diff = millis() - currentTask->getLastStartTime();
         String sDiff= currentTask->formatMS(diff);
         char sint[32];
@@ -302,7 +302,7 @@ Sched::Sched() {
 void Sched::begin() {
     this->mSchedEnabled=1;
 }
-void Sched::addTask(Task *task)
+void Sched::addTask(SafePtr<Task> task)
 {
 #ifdef DEBUG
     Serial.printf("add called for task, %s %x\n",task->getName().c_str(),task);
@@ -329,9 +329,11 @@ void Sched::run()
 #ifdef DEBUG
         //                Serial.println("Looking for tasks");
 #endif
-        SimpleList<Task*>::iterator it;
-        for (it = tTasks.begin(); it != tTasks.end(); ++it){
-            Task *currentTask = *it;
+//        SimpleList<SafePtr<Task> task>::iterator it;
+        for (auto it = tTasks.begin(); it != tTasks.end(); ++it) {
+ //       for (it = tTasks.begin(); it != tTasks.end(); ++it){
+            SafePtr<Task>& currentTask = *it;
+
 #ifdef DEBUGR
             Serial.printf("%s %d task=%x i=%d millis()=%ld Found name=%s, Is enabled? %d\n",__FILE__,__LINE__,currentTask,i++,millis(),currentTask->getName().c_str(),currentTask->isEnabled());
             currentTask->showInit();
@@ -347,7 +349,7 @@ void Sched::run()
     }
 }
 
-const SimpleList<Task *>& Sched::getTasks() const
+const SimpleList<SafePtr<Task>>& Sched::getTasks() const
 {
     return tTasks;
 }

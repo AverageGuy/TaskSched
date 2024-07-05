@@ -7,10 +7,11 @@
 #define TASK_SECOND 1000
 #define TASK_MINUTE 60*TASK_SECOND
 
-#include "SimpleList.h"
-
-
+#include <SimpleList.h>
+#include <SafePtr.h>
 class Task;
+
+
 // was typedef std::function<void(Task *)> voidFuncTypeWith;
 
 class InitialState {
@@ -85,7 +86,17 @@ private:
     // Constructor for callback without Task pointer
     Task(VoidCallback func, double interval = 5.0, bool enabled = false,
          int iterations = 0, const char* name = "Unk", bool runImmediately = false);
-    
+    SafePtr<Task> getSafePtr() {
+        return SafePtr<Task>(this);
+    }
+    /** Usage:
+     *
+     * SaafePtr<Task> createTask( parameters ) {
+     *     Task* rawTask = new Task( parameters );
+     *     return rawTask->getSaafePtr();
+     * }
+     */
+   
     public:
         int mIntI;
         /** return true if this is the first iteration */
@@ -186,7 +197,7 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
     scheduler.addTask(&t2);
 ```
 */
-        void addTask(Task* task);
+        void addTask(SafePtr<Task> task);
         /** enable the scheduler */
         void enable();
         /** disable the scheduler */
@@ -195,12 +206,14 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
         int isEnabled();
         /** returns a list of the tasks */
         //const std::list<Task *>& getTasks() const;
-        const SimpleList<Task *>& getTasks() const;
+//        const SimpleList<Task *>& getTasks() const;
+        const SimpleList<SafePtr<Task>>& getTasks() const;
         /** called perodically to check if a task should be scheduled */
         void run();
 
     private:
-        SimpleList<Task*> tTasks;
+        //SimpleList<Task*> tTasks;
+        SimpleList<SafePtr<Task>> tTasks;
         int mSchedEnabled;
 };
 
