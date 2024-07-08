@@ -63,7 +63,7 @@ Or download the [ZIP](https://github.com/AverageGuy/pyconky/archive/refs/heads/m
 
 Tasks are created using the `Task` constructor:
 
-```
+```cpp
 SafePtr<Task> task = SafePtr<Task>(new Task(callback, interval, enabled, iterations, name, runImmediately));
 SafePtr<Task> task = SafePtr<Task>(new Task(VoidCallBack, interval, enabled, iterations, name, runImmediately));
 ```
