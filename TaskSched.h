@@ -3,26 +3,59 @@
 
 #define DEBUGA 1
 #include "Arduino.h"
+//#include <list>
 #define TASK_SECOND 1000
 #define TASK_MINUTE 60*TASK_SECOND
 
 #include <SimpleList.h>
 #include <SafePtr.h>
-#include <type_traits>
 class Task;
 
-/**
- * @brief Represents the initial state of a Task.
- */
+
+// was typedef std::function<void(Task *)> voidFuncTypeWith;
+
 class InitialState {
 public:
-    unsigned long mInterval;    /**< The initial interval */
-    bool mEnabled;              /**< The initial enabled state */
-    bool mRunImmediately;       /**< The initial run immediately flag */
-    unsigned long mIterations;  /**< The initial number of iterations */
+
+    unsigned long mInterval;
+    /** saved enable flag */
+    bool mEnabled;
+    /** saved run immediately flag */
+    bool mRunImmediately;
+    /** saved run iterations count */
+    unsigned long mIterations;
 };
 using savedInitial = InitialState;
 
+/** Define a new Task.
+ * @param func:
+ * Function to be called at regular intervals.
+ * @param interval:
+ * Time between calls to func, specified in milliseconds or seconds.
+ * If interval is a floating-point value, it's interpreted as seconds; otherwise, it's treated as milliseconds.
+ * @param enabled:
+ * Flag to indicate whether the task should start in an enabled state (true) or disabled state (false).
+ * @param iterations:
+ * Number of times the task will be executed. Set to 0 for infinite iterations.
+ * @param name:
+ * A descriptive string name for the task.
+ * @param runImmediately:
+ * Boolean flag determining whether to run the callback immediately (true) or wait for the interval to expire (false).
+ * 
+ */
+
+/**
+@code 
+Task* t = new Task(turnLedOn, 1000,true,20,"OnOff",true);
+Task t1(turnLedOn, 1000,false,20,"On1",false);
+Task t2(turnLedOn, 2000,false,20,"On2",false);
+
+Output:
+450 Task       On2,  Enabled? 0, Diff 00:15.735, Interval 00:02.000, RI 0
+450 Task       On1,  Enabled? 0, Diff 00:15.735, Interval 00:00.100, RI 0
+450 Task        On,  Enabled? 1, Diff 00:01.721, Interval 00:01.000, RI 0
+@endcode
+*/
 /**
  * @brief Represents a schedulable task.
  * 
@@ -30,10 +63,28 @@ using savedInitial = InitialState;
  * along with parameters controlling its execution.
  */
 class Task {
-public:
-    /** Function pointer type for task callbacks */
-    typedef void (*TaskCallback)(Task*);
 
+    public:
+    // Function pointer types
+    typedef void (*TaskCallback)(Task*);
+    typedef void (*VoidCallback)();
+private:
+    TaskCallback mProcWithTask;
+    VoidCallback mProcVoid;
+    bool mWithTaskPtr;
+
+//        voidFuncTypeWith mProc;
+        unsigned long mInterval;
+        bool mEnabled;
+        unsigned long mIterations;
+        String mName;
+        bool mRunImmediately;
+        unsigned long mIterationCount;
+        bool doShow=true;
+        unsigned long mLastStartTime;
+        savedInitial mOrig;
+        unsigned long passedInterval=1000;
+    public:
     /**
      * @brief Constructs a new Task.
      * 
@@ -44,117 +95,159 @@ public:
      * @param iterations Number of times the task will be executed (0 for infinite)
      * @param name A descriptive name for the task
      * @param runImmediately Whether to run the callback immediately or wait for the interval
+     * @return The first form returns a pointer to the task, the second does not.
      */
-    template<typename T>
-    Task(TaskCallback func, T interval, bool enabled = false,
+    Task(TaskCallback func, unsigned long interval = 5000, bool enabled = false,
          int iterations = 0, const char* name = "Unk", bool runImmediately = false);
 
-    /**
-     * @brief Sets a new callback function for the task.
-     * @param callback The new callback function
-     */
-    void setCallback(const TaskCallback& callback);
-
+    // Constructor for callback without Task pointer
+    Task(VoidCallback func, unsigned long interval = 5000, bool enabled = false,
+         int iterations = 0, const char* name = "Unk", bool runImmediately = false);
     /**
      * @brief Gets a SafePtr to this Task.
      * @return SafePtr<Task> A safe pointer to this Task
      */
-    SafePtr<Task> getSafePtr();
-
-    // ... (other method declarations)
-
-private:
-    template<typename T>
-    void initializeTask(T interval, bool enabled, int iterations, const char* name, bool runImmediately);
-
-    TaskCallback mProcWithTask;  /**< The task's callback function */
-    long mInterval;              /**< The task's interval in milliseconds */
-    bool mEnabled;               /**< Whether the task is currently enabled */
-    unsigned long mIterations;   /**< Number of iterations for this task */
-    String mName;                /**< The name of this task */
-    bool mRunImmediately;        /**< Whether to run immediately when enabled */
-    unsigned long mIterationCount; /**< Current iteration count */
-    bool doShow;                 /**< Whether to show debug information */
-    unsigned long mLastStartTime; /**< Last time the task was started */
-    savedInitial mOrig;          /**< Original state of the task */
-    double passedInterval;       /**< Interval passed to constructor */
-
-public:
-    // ... (other public method declarations)
+    SafePtr<Task> getSafePtr() {
+        return SafePtr<Task>(this);
+    }
+    /** Usage:
+     *
+     * SaafePtr<Task> createTask( parameters ) {
+     *     Task* rawTask = new Task( parameters );
+     *     return rawTask->getSaafePtr();
+     * }
+     */
+   
+    public:
+        int mIntI;
+        /** return true if this is the first iteration */
+        bool isFirstIteration();
+        /** return true if this is the last iteration */
+        bool isLastIteration(); 
+        /** return true if the run immediately flag is set */
+        bool fRunImmediately();
+        /** restart the task with the original parameters, Enable is not restored */
+        void restart(); 
+        /** enable the task */
+        void enable(); 
+        /**disable the task */
+        void disable(); 
+        /** return true if task is enabled */
+        bool isEnabled();
+    /**
+     * @brief Sets a new callback function for the task.
+     * @param callback The new callback function
+     */
+        void setCallback(const TaskCallback &);
+        void setCallback(const VoidCallback &);
+        /** give the task a new name */
+        void setName(String);
+        /** function used by the schedule to run this task, shouldn't be called by user */
+        void  runIt();
+        /** display stuff */
+        void showInit();
+        /** return string containing name of task */
+        String getName();
+        /** return the iteration count, that is the number of iterations that the task has been run */
+        unsigned long getIterationCount();
+        /** function to set a new interval */
+        void setInterval(unsigned long newInterval);
+        /** function to set a new iterations value */
+        void setIterations(unsigned long newIterations);
+        /** function to set the run immediately flag */
+        void setImmediately(bool);
+        /** function that displays task info */
+        String showTaskInfo();
+        /** return the task interval */
+        unsigned long getInterval(void);
+        /** return the run immediately flag */
+        bool getRunImmediately(void);
+        /** return the last start time flag */
+        unsigned long getLastStartTime(void);
+        /** return a string with a formatted time */
+        String formatMS(unsigned long milliseconds);
 };
-
 /**
- * @brief Scheduler for managing multiple tasks.
- */
-class Sched {
-public:
-    /**
-     * @brief Get the number of tasks in the run queue.
-     * @return unsigned long The number of tasks
-     */
-    unsigned long getSize();
+@code 
+Task* t = new Task(turnLedOn, 1000,true,20,"OnOff",true);
+Task t1(turnLedOn, 100,false,20,"On1",false);
+Task t2(turnLedOn, 2.0,false,20,"On2",false);
 
-    /**
-     * @brief Display the status of tasks.
-     * @param num Number of tasks to display (0 for all enabled tasks)
-     * @param taskName Name of a specific task to display (if empty, displays based on num)
-     * @param raw Whether to display raw interval values
-     * @return String A string containing the status information
-     */
-    String displayStatus(int num, String taskName="", bool raw=false);
+Output as generated by scheduler.displayStatus(true):
 
-    /**
-     * @brief Default constructor.
-     */
-    Sched();
+450 Task       On2,  Enabled? 0, Diff 00:15.735, Interval 00:02.000, RI 0
+450 Task       On1,  Enabled? 0, Diff 00:15.735, Interval 00:00.100, RI 0
+450 Task        On,  Enabled? 1, Diff 00:01.721, Interval 00:01.000, RI 0
+@endcode
+*/
 
-    /**
-     * @brief Start the scheduling.
-     * 
-     * This method must be called to enable the scheduler.
-     */
-    void begin();
+class Sched
+{
+    public:
+        /** return the number of tasks in the run queue */
+        unsigned long getSize();
+        /** function to display the status of the tasks 
+```
+Sample output:
+	Task       On2,  Enabled? 0, Diff 59:40.731, Interval 00:02.000, RI 0
+	Task       On1,  Enabled? 0, Diff 59:40.731, Interval 00:00.100, RI 0
+	Task        On,  Enabled? 0, Diff 59:19.710, Interval 00:01.000, RI 0
+Source:
+    String str = scheduler.displayStatus(true);
+    Serial.print(str);
+```
+         * */
+        String displayStatus(int num,String taskName="",bool raw=false);
+        /** default constructor */
+        Sched();
+        /** used to start the scheduling. A call to begin will also enable the scheduler. 
+```
+Sched scheduler;  
+	scheduler.begin();
+```
+         */
+        void begin();
+        /** add a task to the run queue */
+/**
+```
+Example: 
 
-    /**
-     * @brief Add a task to the run queue.
-     * @param task SafePtr to the Task to be added
-     */
-    void addTask(SafePtr<Task> task);
+Task* t = new Task(turnLedOn, 1000,true,20,"OnOff",true);
+Task t1(dummy, 100, false, 20, "On1", * false);
+Task t2(dummy, 2.0, false, 20, "On2", * false);
 
-    /**
-     * @brief Enable the scheduler.
-     */
-    void enable();
+    scheduler.addTask(t);
+    scheduler.addTask(&t1);
+    scheduler.addTask(&t2);
+```
+*/
+        void addTask(SafePtr<Task> task);
+        /** enable the scheduler */
+        void enable();
+        /** disable the scheduler */
+        void disable();
+        /** return true if the scheduler is enabled */
+        int isEnabled();
+        /** returns a list of the tasks */
+        //const std::list<Task *>& getTasks() const;
+//        const SimpleList<Task *>& getTasks() const;
+        const SimpleList<SafePtr<Task>>& getTasks() const;
+        /** called perodically to check if a task should be scheduled */
+        void run();
 
-    /**
-     * @brief Disable the scheduler.
-     */
-    void disable();
-
-    /**
-     * @brief Check if the scheduler is enabled.
-     * @return int 1 if enabled, 0 if disabled
-     */
-    int isEnabled();
-
-    /**
-     * @brief Get a reference to the list of tasks.
-     * @return const SimpleList<SafePtr<Task>>& Reference to the list of tasks
-     */
-    const SimpleList<SafePtr<Task>>& getTasks() const;
-
-    /**
-     * @brief Run the scheduler.
-     * 
-     * This method should be called periodically to check and run scheduled tasks.
-     */
-    void run();
-
-private:
-    SimpleList<SafePtr<Task>> tTasks;  /**< List of tasks managed by this scheduler */
-    int mSchedEnabled;                 /**< Whether the scheduler is currently enabled */
+    private:
+        //SimpleList<Task*> tTasks;
+        SimpleList<SafePtr<Task>> tTasks;
+        int mSchedEnabled;
 };
 
-#include "TaskSched.tpp"
-
-#endif // TASKSCHED_H
+///home/jwl/sketchbook/libraries/TaskSched/TaskSched.h 127 Task Rand_4720, Diff 0:09:054, Interval 0:04:720, RI 0
+ /* @param func    Function to be called.
+ * @param interval      Time between calls to func in milliseconds.
+ * If intval is passed as a floating point number, e. g. 4.5 then it is treated as if it were a number of seconds otherwise the interval is treated as if it were a number of millisconds
+ * @param enabled   Flag to be set if the task should start in an enabled state.
+ * @param iterations    Number of iterations the task will be run.  Set to zero for infinited iterations.
+ * @param name   A String value of a name of the task.
+ * @param runImmediately  A boolean flag that directs the scheduler to run the callback immediately rather than wait for the interval to expire. False says to wait for the interval to run the task.
+*/
+#endif
