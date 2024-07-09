@@ -37,7 +37,7 @@ Can be a good choice for specific situations where tasks have well-defined execu
 - [Issues](#issues)
 - [Contributing](#contributing)
 
-## Main Features
+## Main Features {#main-features}
 
 1. **Periodic task execution**: Tasks can be set to run at specified intervals, with times specified in milliseconds or seconds.
 2. **Task enable/disable support**: Tasks can be dynamically enabled or disabled.
@@ -109,7 +109,7 @@ See the `examples/SkedBlink1/SkedBlink1.ino` file for a basic example of blinkin
 
 ## API Reference
 
-For detailed API documentation, please refer to the Doxygen-generated documentation in the `docs` folder.
+For detailed API documentation, please refer to the Doxygen-generated documentation in the `html` folder.
 
 ## Issues
 
