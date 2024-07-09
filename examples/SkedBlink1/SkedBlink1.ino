@@ -54,8 +54,6 @@ void turnLed(Task *tsk) {
 void turnLedOff(Task *tsk) {
   digitalWrite(ledPin, LOW);  
   t2->setInterval(2000);
-  Serial.print("Interval is ");
-  Serial.println(tsk->getInterval());
 }
 unsigned long start;
 unsigned long elapsed;
@@ -64,43 +62,22 @@ unsigned long limit = 5000;
 void setup() {
 
 
-  ledPin = 16; // this worked for my 
-    Serial.begin(115200);
+  ledPin = LED_BUILTIN; // Works with some boards, not all 
+  Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
-  t3 = SafePtr<Task>(new Task(turnLed, 5.0, true, 20, "OnTask", true));
   t1 = SafePtr<Task>(new Task(turnLedOn, 2000L, true, 20, "OnTask", true));
   t2 = SafePtr<Task>(new Task(turnLedOff, 1000L, true, 20, "OffTask", false));
-  scheduler.addTask(t3);
   scheduler.addTask(t1);
   scheduler.addTask(t2);
   Serial.println("Starting");
-  String str = scheduler.displayStatus(true);
-  delay(500);
-  Serial.print(str);
-turnLedOnx( ) ;
-
-turnLedOnx() ;
-  
   scheduler.begin();
-turnLedOnx() ;
-  str = scheduler.displayStatus(true);
-  Serial.print(str);
 
   start=millis();
-  double interval=5.0;
-  Serial.println(interval ==static_cast<long>(interval));
 }
 
 void loop() {
 
   scheduler.run();
-  elapsed= millis() - start;
-  if(elapsed>limit) {
-      start = millis();
-      String str = scheduler.displayStatus(true);
-      Serial.print(str);
-
-  }
 
   // Validate LED blinks on even seconds
   // and off on odd seconds for 20 iterations

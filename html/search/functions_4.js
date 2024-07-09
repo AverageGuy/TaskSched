@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['formatms_61',['formatMS',['../classTask.html#a6fea462a4230640e52b3d5a6bd4f04b1',1,'Task']]],
-  ['frunimmediately_62',['fRunImmediately',['../classTask.html#a5d181709781ebfcce5a3a859e3040cb3',1,'Task']]]
+  ['enable_88',['enable',['../classTask.html#ae98967d438138cce890d6520e0b5426c',1,'Task::enable()'],['../classSched.html#a6b2336fbcd3680a8b6584dea99736b66',1,'Sched::enable()']]],
+  ['end_89',['end',['../classSimpleList.html#acb27536b98a57a09f453632e4355b7b6',1,'SimpleList']]]
 ];

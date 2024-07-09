@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['enable_60',['enable',['../classTask.html#ae98967d438138cce890d6520e0b5426c',1,'Task::enable()'],['../classSched.html#a6b2336fbcd3680a8b6584dea99736b66',1,'Sched::enable()']]]
+  ['disable_86',['disable',['../classTask.html#ae1b427d535011c4535b2026d3cd180a9',1,'Task::disable()'],['../classSched.html#ae3860f1f7ee002d7ced2c130db60f14d',1,'Sched::disable()']]],
+  ['displaystatus_87',['displayStatus',['../classSched.html#a654949550a6669b436da3285b1b0fa78',1,'Sched']]]
 ];
