@@ -37,7 +37,7 @@ Can be a good choice for specific situations where tasks have well-defined execu
 - [Issues](#issues)
 - [Contributing](#contributing)
 
-## Main Features{#main-features}
+## Main Features
 
 1. **Periodic task execution**: Tasks can be set to run at specified intervals, with times specified in milliseconds or seconds.
 2. **Task enable/disable support**: Tasks can be dynamically enabled or disabled.
@@ -47,7 +47,7 @@ Can be a good choice for specific situations where tasks have well-defined execu
 6. **Flexible timing control**: The scheduler can be run periodically in the main loop.
 7. **Safe pointer implementation**: Uses `SafePtr` for improved memory management and safety.
 
-- (Installation) {#installation}
+## Installation
 
 To install TaskSched, clone the repository:
 
