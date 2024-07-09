@@ -47,7 +47,7 @@ Can be a good choice for specific situations where tasks have well-defined execu
 6. **Flexible timing control**: The scheduler can be run periodically in the main loop.
 7. **Safe pointer implementation**: Uses `SafePtr` for improved memory management and safety.
 
-## Installation
+- (Installation) {#installation}
 
 To install TaskSched, clone the repository:
 
