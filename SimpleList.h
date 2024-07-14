@@ -1,7 +1,6 @@
 #ifndef SIMPLE_LIST_H
 #define SIMPLE_LIST_H
 
-#include "SafePtr.h"
 
 /**
  * @brief A simple linked list implementation

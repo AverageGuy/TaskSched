@@ -1,14 +1,13 @@
 #ifndef TASKSCHED_H
 #define TASKSCHED_H
 
-#define DEBUGA 1
+//#define DEBUGA 1
 #include "Arduino.h"
 //#include <list>
 #define TASK_SECOND 1000
 #define TASK_MINUTE 60*TASK_SECOND
 
 #include <SimpleList.h>
-#include <SafePtr.h>
 class Task;
 
 
@@ -22,12 +21,23 @@ class Task;
 class InitialState {
 public:
 
+    /**
+    * @brief This member holds the original interval value.
+    */
     unsigned long mInterval;
-    /** saved enable flag */
+    /**
+    * @brief    saved enable flag
+    */
     bool mEnabled;
-    /** saved run immediately flag */
+    /**
+    * @brief    saved run immediately flag
+    * @return 
+    */
     bool mRunImmediately;
-    /** saved run iterations count */
+    /**
+    * @brief    saved run iterations count
+    * @return 
+    */
     unsigned long mIterations;
 };
 using savedInitial = InitialState;
@@ -52,11 +62,11 @@ using savedInitial = InitialState;
 /**
 @code 
 Task* t = new Task(turnLedOn, 1000,true,20,"OnOff",true);
-Task t1(turnLedOn, 1000,false,20,"On1",false);
-Task t2(turnLedOn, 2000,false,20,"On2",false);
+Task t1(turnLedOn, 1000,false,100,"On1",false);
+Task t2(turnLedOn, 2000,false,2000,"On2",false);
 
 Output:
-450 Task       On2,  Enabled? 0, Diff 00:15.735, Interval 00:02.000, RI 0
+450 Task       On2,  Enabled? 0, Diff 00:15.735, Interval 00:02.000, RI 1
 450 Task       On1,  Enabled? 0, Diff 00:15.735, Interval 00:00.100, RI 0
 450 Task        On,  Enabled? 1, Diff 00:01.721, Interval 00:01.000, RI 0
 @endcode
@@ -70,121 +80,197 @@ Output:
 class Task {
 
     public:
-    // Function pointer types
-    typedef void (*TaskCallback)(Task*);
-    typedef void (*VoidCallback)();
-private:
-    TaskCallback mProcWithTask;
-    VoidCallback mProcVoid;
-    bool mWithTaskPtr;
+        // Function pointer types
+        typedef void (*TaskCallback)(Task*);
+        typedef void (*VoidCallback)();
+        /**
+         * @brief Constructs a new Task.
+         * 
+         * @tparam T Type of the interval (can be integral or floating-point)
+         * @param func Function to be called at regular intervals
+         * @param interval Time between calls to func (in milliseconds if integral, seconds if floating-point)
+         * @param enabled Flag to indicate whether the task should start in an enabled state
+         * @param iterations Number of times the task will be executed (0 for infinite)
+         * @param name A descriptive name for the task
+         * @param runImmediately Whether to run the callback immediately or wait for the interval
+         * @return The first form returns a pointer to the task, the second does not.
+         */
+        Task(TaskCallback func, unsigned long interval = 5000, bool enabled = false,
+                int iterations = 0, const char* name = "Unk", bool runImmediately = false);
 
-//        voidFuncTypeWith mProc;
+        // Constructor for callback without Task pointer
+        Task(VoidCallback func, unsigned long interval = 5000, bool enabled = false,
+                int iterations = 0, const char* name = "Unk", bool runImmediately = false);
+
+    private:
+        /**
+         * @brief  Contains a pointer to the function that will be called when the task is run. 
+         * @return It returns a pointer to the Task object.
+         */
+        TaskCallback mProcWithTask;
+        /**
+         * @brief  Contains a pointer to the function that will be called when the task is run. 
+         */
+        VoidCallback mProcVoid;
+        /**
+         * @brief  Contains a pointer to the function that will be called when the task is run. 
+         */
+        bool mWithTaskPtr;
+
+        /**
+         * @brief This stores the interval that was passed at object creation.
+         */
         unsigned long mInterval;
+        /**
+         * @brief  This stores the enable status of the Task.  It was set at object creation.
+         */
         bool mEnabled;
+        /**
+         * @brief This is the number of iterations that the Task object will run.
+         */
         unsigned long mIterations;
+        /**
+         * @brief Name of the Task set at creation.
+         */
         String mName;
+        /**
+         * @brief This is a flag that tells the scheduler to initiall run the Task immediately.  Otherwise it will run after
+         *        the interval expires.
+         */
         bool mRunImmediately;
+        /**
+         * @brief This is where the iteration counter is stored.
+         */
         unsigned long mIterationCount;
+        /**
+         * @brief This is a flag used internally to limit the showInit method runs only once.
+         */
         bool doShow=true;
+        /**
+         * @brief 
+         */
         unsigned long mLastStartTime;
+        /**
+         * @brief 
+         */
         savedInitial mOrig;
-        unsigned long passedInterval=1000;
+        /**
+         * @brief        return true if this is the first iteration
+         * @return 
+         */
     public:
-    /**
-     * @brief Constructs a new Task.
-     * 
-     * @tparam T Type of the interval (can be integral or floating-point)
-     * @param func Function to be called at regular intervals
-     * @param interval Time between calls to func (in milliseconds if integral, seconds if floating-point)
-     * @param enabled Flag to indicate whether the task should start in an enabled state
-     * @param iterations Number of times the task will be executed (0 for infinite)
-     * @param name A descriptive name for the task
-     * @param runImmediately Whether to run the callback immediately or wait for the interval
-     * @return The first form returns a pointer to the task, the second does not.
-     */
-    Task(TaskCallback func, unsigned long interval = 5000, bool enabled = false,
-         int iterations = 0, const char* name = "Unk", bool runImmediately = false);
-
-    // Constructor for callback without Task pointer
-    Task(VoidCallback func, unsigned long interval = 5000, bool enabled = false,
-         int iterations = 0, const char* name = "Unk", bool runImmediately = false);
-    /**
-     * @brief Gets a SafePtr to this Task.
-     * @return SafePtr<Task> A safe pointer to this Task
-     */
-    SafePtr<Task> getSafePtr() {
-        return SafePtr<Task>(this);
-    }
-    /** Usage:
-     *
-     * SaafePtr<Task> createTask( parameters ) {
-     *     Task* rawTask = new Task( parameters );
-     *     return rawTask->getSaafePtr();
-     * }
-     */
-   
-    public:
-        int mIntI;
-        /** return true if this is the first iteration */
         bool isFirstIteration();
-        /** return true if this is the last iteration */
+        /**
+         * @brief        return true if this is the last iteration
+         * @return 
+         */
         bool isLastIteration(); 
-        /** return true if the run immediately flag is set */
+        /**
+         * @brief        return true if the run immediately flag is set
+         * @return 
+         */
         bool fRunImmediately();
-        /** restart the task with the original parameters, Enable is not restored */
+        /**
+         * @brief        restart the task with the original parameters, Enable is not restored
+         */
         void restart(); 
-        /** enable the task */
+        /**
+         * @brief        enable the task
+         */
         void enable(); 
-        /**disable the task */
+        /**
+         * @brief       disable the task
+         */
         void disable(); 
-        /** return true if task is enabled */
+        /**
+         * @brief        return true if task is enabled
+         * @return 
+         */
         bool isEnabled();
-    /**
-     * @brief Sets a new callback function for the task.
-     * @param callback The new callback function
-     */
-        void setCallback(const TaskCallback &);
-        void setCallback(const VoidCallback &);
-        /** give the task a new name */
+        /**
+         * @brief Sets a new callback function for the task.
+         * @param callback The new callback function
+         */
+        void setCallback(const TaskCallback &callback);
+        /**
+         * @brief Sets a new callback function for the task.
+         * @param callback The new callback function
+         */
+        void setCallback(const VoidCallback &callback);
+        /**
+         * @brief        give the task a new name
+         */
         void setName(String);
-        /** function used by the schedule to run this task, shouldn't be called by user */
+        /**
+         * @brief        function used by the schedule to run this task, shouldn't be called by user
+         */
         void  runIt();
-        /** display stuff */
+        /**
+         * @brief        display stuff
+         */
         void showInit();
-        /** return string containing name of task */
+        /**
+         * @brief        return string containing name of task
+         * @return 
+         */
         String getName();
-        /** return the iteration count, that is the number of iterations that the task has been run */
+        /**
+         * @brief        return the iteration count, that is the number of iterations that the task has been run
+         * @return 
+         */
         unsigned long getIterationCount();
-        /** function to set a new interval */
+        /**
+         * @brief        function to set a new interval
+         */
         void setInterval(unsigned long newInterval);
-        /** function to set a new iterations value */
+        /**
+         * @brief        function to set a new iterations value
+         */
         void setIterations(unsigned long newIterations);
-        /** function to set the run immediately flag */
+        /**
+         * @brief        function to set the run immediately flag
+         */
         void setImmediately(bool);
-        /** function that displays task info */
+        /**
+         * @brief        function that displays task info
+         *
+         * @return String containing info about all tasks tasks.
+         */
         String showTaskInfo();
-        /** return the task interval */
+        /**
+         * @brief        return the task interval
+         * @return 
+         */
         unsigned long getInterval(void);
-        /** return the run immediately flag */
+        /**
+         * @brief        return the run immediately flag
+         * @return 
+         */
         bool getRunImmediately(void);
-        /** return the last start time flag */
+        /**
+         * @brief        return the last start time flag
+         * @return 
+         */
         unsigned long getLastStartTime(void);
-        /** return a string with a formatted time */
+        /**
+         * @brief        return a string with a formatted time
+         * @return 
+         */
         String formatMS(unsigned long milliseconds);
 };
 /**
-@code 
-Task* t = new Task(turnLedOn, 1000,true,20,"OnOff",true);
-Task t1(turnLedOn, 100,false,20,"On1",false);
-Task t2(turnLedOn, 2.0,false,20,"On2",false);
+  @code 
+  Task* t = new Task(turnLedOn, 1000,true,20,"OnOff",true);
+  Task t1(turnLedOn, 100,false,20,"On1",false);
+  Task t2(turnLedOn, 2.0,false,20,"On2",false);
 
-Output as generated by scheduler.displayStatus(true):
+  Output as generated by scheduler.displayStatus(true):
 
-450 Task       On2,  Enabled? 0, Diff 00:15.735, Interval 00:02.000, RI 0
-450 Task       On1,  Enabled? 0, Diff 00:15.735, Interval 00:00.100, RI 0
-450 Task        On,  Enabled? 1, Diff 00:01.721, Interval 00:01.000, RI 0
-@endcode
-*/
+  450 Task       On2,  Enabled? 0, Diff 00:15.735, Interval 00:02.000, RI 0
+  450 Task       On1,  Enabled? 0, Diff 00:15.735, Interval 00:00.100, RI 0
+  450 Task        On,  Enabled? 1, Diff 00:01.721, Interval 00:01.000, RI 0
+  @endcode
+ */
 
 /**
  * @brief This class runs the scheduled tasks.
@@ -194,9 +280,12 @@ Output as generated by scheduler.displayStatus(true):
 class Sched
 {
     public:
-        /** return the number of tasks in the run queue */
+        /**
+        * @brief        return the number of tasks in the run queue
+        * @return 
+        */
         unsigned long getSize();
-        /** function to display the status of the tasks 
+      /** function to display the status of the tasks
 ```
 Sample output:
 	Task       On2,  Enabled? 0, Diff 59:40.731, Interval 00:02.000, RI 0
@@ -207,17 +296,22 @@ Source:
     Serial.print(str);
 ```
          * */
+        /**
+        * @brief 
+        * @return 
+        */
         String displayStatus(int num,String taskName="",bool raw=false);
-        /** default constructor */
         Sched();
-        /** used to start the scheduling. A call to begin will also enable the scheduler. 
+      /** used to start the scheduling. A call to begin will also enable the scheduler.
 ```
 Sched scheduler;  
 	scheduler.begin();
 ```
          */
+        /**
+        * @brief 
+        */
         void begin();
-        /** add a task to the run queue */
 /**
 ```
 Example: 
@@ -231,23 +325,42 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
     scheduler.addTask(&t2);
 ```
 */
-        void addTask(SafePtr<Task> task);
-        /** enable the scheduler */
+        /**
+        * @brief 
+        */
+        void addTask(Task *task);
+        /**
+        * @brief        enable the scheduler
+        */
         void enable();
-        /** disable the scheduler */
+        /**
+        * @brief        disable the scheduler
+        */
         void disable();
-        /** return true if the scheduler is enabled */
+        /**
+        * @brief        return true if the scheduler is enabled
+        * @return 
+        */
         int isEnabled();
-        /** returns a list of the tasks */
         //const std::list<Task *>& getTasks() const;
 //        const SimpleList<Task *>& getTasks() const;
-        const SimpleList<SafePtr<Task>>& getTasks() const;
-        /** called perodically to check if a task should be scheduled */
+        const SimpleList<Task *>& getTasks() const;
+        /**
+        * @brief        called perodically to check if a task should be scheduled
+        */
         void run();
 
     private:
         //SimpleList<Task*> tTasks;
-        SimpleList<SafePtr<Task>> tTasks;
+        /**
+        * @brief 
+        * @return 
+        */
+        SimpleList<Task *> tTasks;
+        /**
+        * @brief 
+        * @return 
+        */
         int mSchedEnabled;
 };
 
