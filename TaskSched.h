@@ -79,6 +79,14 @@ Output:
  */
 class Task {
 
+    private:
+        /**
+         * @brief        function used by the schedule to run this task, shouldn't be called by user
+         */
+        void  runIt();
+        // make Sched a friend so it can call a private method, runIt
+        friend class Sched;
+
     public:
         // Function pointer types
         typedef void (*TaskCallback)(Task*);
@@ -201,10 +209,6 @@ class Task {
          * @brief        give the task a new name
          */
         void setName(String);
-        /**
-         * @brief        function used by the schedule to run this task, shouldn't be called by user
-         */
-        void  runIt();
         /**
          * @brief        display stuff
          */
