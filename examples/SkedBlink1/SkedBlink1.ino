@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <TaskSched.h>
-#include <SafePtr.h>
 /** Test LED Blink Tasks
  * You may have to adjust the ledPin for your dev board
  * It blinks the led on and off every second. For 20 iterations
@@ -20,8 +19,8 @@ void turnLedOff(Task*);
 
 Sched scheduler; 
 
-SafePtr<Task> t1;
-SafePtr<Task> t2;
+Task *t1;
+Task *t2;
 
 void turnLedOn(Task *tsk) {
     Serial.println("Turn on");
@@ -35,7 +34,7 @@ void turnLedOn(Task *tsk) {
 void turnLedOff(Task *tsk) {
     Serial.println("Turn off");
     String res;
-    res = tsk->formatMS(millis());
+    res = Task::formatMS(millis());
     Serial.printf("OffTime: %s\n",res.c_str());
     digitalWrite(ledPin, LOW);  
     t2->setInterval(2000);
@@ -51,8 +50,8 @@ void setup() {
     Serial.begin(115200);
     delay(500); // wait for serial
     pinMode(ledPin, OUTPUT);
-    t1 = SafePtr<Task>(new Task(turnLedOn, 2000L, true, 20, "OnTask", true));
-    t2 = SafePtr<Task>(new Task(turnLedOff, 1000L, true, 20, "OffTask", false));
+    t1 = new Task(turnLedOn, 2000L, true, 20, "OnTask", true);
+    t2 = new Task(turnLedOff, 1000L, true, 20, "OffTask", false);
     scheduler.addTask(t1);
     scheduler.addTask(t2);
     Serial.println("");

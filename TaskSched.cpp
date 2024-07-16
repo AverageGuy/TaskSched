@@ -76,7 +76,7 @@ void Task::showInit() {
     doShow=false; // only do it once
 #ifdef DEBUG
 
-    res = formatMS(mInterval);
+    res = Task::formatMS(mInterval);
     Serial.printf("%s %d showInit: Name: %s, interval: %s, enabled:%d, iterations:%ld %x\n",
             __FILE__,__LINE__,mName,res,mEnabled,mIterations,this);
 #endif
@@ -103,8 +103,8 @@ String Task::showTaskInfo() {
 
     char buf[200];
     unsigned long diff = millis() - getLastStartTime();
-    String sDiff= formatMS(diff);
-    String sInt= formatMS(getInterval());
+    String sDiff= Task::formatMS(diff);
+    String sInt= Task::formatMS(getInterval());
 #ifdef DEBUG
     Serial.printf("%s %d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__FILE__,__LINE__,this->getName().c_str(),isEnabled(),sDiff.c_str(),sInt.c_str(),getRunImmediately());
     if(passedInterval >0) {
@@ -202,8 +202,8 @@ void Task::runIt() {
         mRunImmediately = false;
 
         unsigned long diff = millis() - getLastStartTime();
-        String sDiff= formatMS(diff);
-        String sInt= formatMS(getInterval());
+        String sDiff= Task::formatMS(diff);
+        String sInt= Task::formatMS(getInterval());
 #ifdef DEBUG
         Serial.printf("%s %d Task %s, Enabled? %d, Diff %s, Interval %s, RI %d\n",__FILE__,__LINE__,getName().c_str(),isEnabled(),sDiff.c_str(),sInt.c_str(),getRunImmediately());
 #endif
@@ -257,12 +257,12 @@ String Sched::displayStatus(int num,String taskName,bool raw) {
                                   // 
                                   // 
         unsigned long diff = millis() - currentTask->getLastStartTime();
-        String sDiff= currentTask->formatMS(diff);
+        String sDiff= Task::formatMS(diff);
         char sint[32];
         if(raw) {
             sprintf(sint,"%ld",  currentTask->getInterval());
         } else {
-            String sIntx= currentTask->formatMS(currentTask->getInterval());
+            String sIntx= Task::formatMS(currentTask->getInterval());
             strcpy(sint,sIntx.c_str());
         }
         String sInt(sint);

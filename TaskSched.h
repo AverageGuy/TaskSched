@@ -260,7 +260,7 @@ class Task {
          * @brief        return a string with a formatted time
          * @return 
          */
-        String formatMS(unsigned long milliseconds);
+        static String formatMS(unsigned long milliseconds);
 };
 /**
   @code 

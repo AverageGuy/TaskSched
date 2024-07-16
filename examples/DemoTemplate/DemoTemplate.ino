@@ -1,5 +1,4 @@
 /*
- * Serial.println{"Attempting connect to 
   -----------------------
   Demo OTA based on ElegantOTA - Demo Example
   -----------------------
