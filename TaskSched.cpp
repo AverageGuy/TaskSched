@@ -260,7 +260,7 @@ String Sched::displayStatus(int num,String taskName,bool raw) {
         String sDiff= currentTask->formatMS(diff);
         char sint[32];
         if(raw) {
-            sprintf(sint,"%d",  currentTask->getInterval());
+            sprintf(sint,"%ld",  currentTask->getInterval());
         } else {
             String sIntx= currentTask->formatMS(currentTask->getInterval());
             strcpy(sint,sIntx.c_str());
