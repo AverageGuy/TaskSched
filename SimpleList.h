@@ -14,7 +14,7 @@ private:
      * @brief Node structure for the linked list
      */
     struct Node {
-        T data;     ///< The data stored in the node (SafePtr<Task> when T is Task)
+        T data;     ///< The data stored in the node (Task when T is Task)
         Node* next; ///< Pointer to the next node
 
         /**
@@ -27,7 +27,7 @@ private:
 
     Node* head;           ///< Pointer to the first node in the list
     Node* tail;           ///< Pointer to the last node in the list
-    Node* read_position;  ///< Current read position for the read() method
+    mutable Node* read_position;  ///< Current read position for the read() method
     size_t size;          ///< Number of elements in the list
 
 public:
@@ -81,21 +81,21 @@ public:
     /**
      * @brief Read the current element and move the read position to the next element
      * 
-     * @return T The current element (empty SafePtr<Task> if read_position is null)
+     * @return T The current element (empty T if read_position is null)
      */
-    T read() {
+    T read() const {
         if (read_position) {
             T value = read_position->data;
             read_position = read_position->next;
             return value;
         }
-        return T();  // Return empty SafePtr<Task>
+        return T();  // Return empty T
     }
 
     /**
      * @brief Reset the read position to the beginning of the list
      */
-    void rewind() {
+    void rewind() const {
         read_position = head;
     }
 
@@ -134,6 +134,82 @@ public:
     /**
      * @brief Iterator class for SimpleList
      */
+    class const_iterator {
+    private:
+        const Node* current; ///< Pointer to the current node
+
+    public:
+        /**
+         * @brief Construct a new const_iterator object
+         */
+        const_iterator() : current(nullptr) {}
+
+        /**
+         * @brief Construct a new const_iterator object
+         * 
+         * @param node Pointer to the starting node
+         */
+        explicit const_iterator(const Node* node) : current(node) {}
+
+        /**
+         * @brief Dereference operator
+         * 
+         * @return const T& Const reference to the data in the current node
+         */
+        const T& operator*() const { return current->data; }
+
+        /**
+         * @brief Arrow operator
+         * 
+         * @return const T* Const pointer to the data in the current node
+         */
+        const T* operator->() const { return &current->data; }
+
+        /**
+         * @brief Prefix increment operator
+         * 
+         * @return const_iterator& Reference to the incremented const_iterator
+         */
+        const_iterator& operator++() { if (current) current = current->next; return *this; }
+
+        /**
+         * @brief Postfix increment operator
+         * 
+         * @return const_iterator Copy of the original iterator
+         */
+        const_iterator operator++(int) { const_iterator tmp = *this; ++(*this); return tmp; }
+
+        /**
+         * @brief Inequality comparison operator
+         * 
+         * @param other Another const_iterator to compare with
+         * @return true if the const_iterators are not equal, false otherwise
+         */
+        bool operator!=(const const_iterator& other) const { return current != other.current; }
+
+        /**
+         * @brief Equality comparison operator
+         * 
+         * @param other Another const_iterator to compare with
+         * @return true if the const_iterators are equal, false otherwise
+         */
+        bool operator==(const const_iterator& other) const { return current == other.current; }
+    };
+
+    /**
+     * @brief Get a const_iterator pointing to the beginning of the list
+     * 
+     * @return const_iterator Const iterator to the first element
+     */
+    const_iterator cbegin() const { return const_iterator(head); }
+
+    /**
+     * @brief Get a const_iterator pointing to the end of the list
+     * 
+     * @return const_iterator Const iterator to the element after the last element
+     */
+    const_iterator cend() const { return const_iterator(nullptr); }
+
     class iterator {
     private:
         Node* current; ///< Pointer to the current node
@@ -194,14 +270,14 @@ public:
      * 
      * @return iterator Iterator to the first element
      */
-    iterator begin() { return iterator(head); }
+    iterator begin() const { return iterator(head); }
 
     /**
      * @brief Get an iterator pointing to the end of the list
      * 
      * @return iterator Iterator to the element after the last element
      */
-    iterator end() { return iterator(nullptr); }
+    iterator end() const { return iterator(nullptr); }
 };
 
 #endif // SIMPLE_LIST_H
