@@ -47,7 +47,7 @@ bool Task::isFirstIteration() {
     return false;
 }
 
-String Task::getName()
+String Task::getName() const
 {
     return mName;
 }
@@ -120,7 +120,7 @@ String Task::showTaskInfo() {
     return "";
 }
 
-bool Task::isEnabled() {
+bool Task::isEnabled() const {
     return mEnabled;
 }
 
@@ -174,22 +174,22 @@ void Task::setInterval(unsigned long newInterval)
     mInterval = newInterval;
 }
 
-bool Task::getRunImmediately(void)
+bool Task::getRunImmediately(void) const
 {
     return mRunImmediately;
 }
 
-unsigned long Task::getInterval(void)
+unsigned long Task::getInterval(void) const
 {
     return mInterval;
 }
 
-unsigned long Task::getLastStartTime(void)
+unsigned long Task::getLastStartTime(void) const
 {
     return mLastStartTime;
 }
 
-unsigned long Task::getIterationCount() 
+unsigned long Task::getIterationCount() const 
 {
     return mIterationCount;
 }

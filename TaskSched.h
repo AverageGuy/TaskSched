@@ -194,7 +194,7 @@ class Task {
          * @brief        return true if task is enabled
          * @return 
          */
-        bool isEnabled();
+        bool isEnabled() const;
         /**
          * @brief Sets a new callback function for the task.
          * @param callback The new callback function
@@ -217,12 +217,12 @@ class Task {
          * @brief        return string containing name of task
          * @return 
          */
-        String getName();
+        String getName() const;
         /**
          * @brief        return the iteration count, that is the number of iterations that the task has been run
          * @return 
          */
-        unsigned long getIterationCount();
+        unsigned long getIterationCount() const;
         /**
          * @brief        function to set a new interval
          */
@@ -245,17 +245,17 @@ class Task {
          * @brief        return the task interval
          * @return 
          */
-        unsigned long getInterval(void);
+        unsigned long getInterval(void) const;
         /**
          * @brief        return the run immediately flag
          * @return 
          */
-        bool getRunImmediately(void);
+        bool getRunImmediately(void) const;
         /**
          * @brief        return the last start time flag
          * @return 
          */
-        unsigned long getLastStartTime(void);
+        unsigned long getLastStartTime(void) const;
         /**
          * @brief        return a string with a formatted time
          * @return 
@@ -346,8 +346,7 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
         * @return 
         */
         int isEnabled();
-        //const std::list<Task *>& getTasks() const;
-//        const SimpleList<Task *>& getTasks() const;
+        /** brief */
         const SimpleList<Task *>& getTasks() const;
         /**
         * @brief        called perodically to check if a task should be scheduled
