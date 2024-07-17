@@ -1,11 +1,21 @@
 #include <TaskSched.h>
+#ifdef LED_BUILTIN
 int ledPin = LED_BUILTIN;
+#else
+int ledPin =2;
+#endif
+/** if LED_BUILTIN isn't defined for your board, you will have to set it
+ * manually. */
+
+/** On my ESP32 test board, the function of the led is inverted so 
+ * when it thought it was turning the led on it was actually turning it off.
+ */
+
 /**
  * Turns led on and off every  second for 20 iterations
  * It uses the setCallback of the Task class to swap the 
  * turnLedOn and turnLedOff functions while running only one task
  */
-
 
 int count=0;
 void dummy(Task * );
@@ -125,10 +135,33 @@ void loop() {
                 }
             }
             Serial.printf("%ld Found %s\n",__LINE__,teststr.c_str());
+            /** To demonstrate these two operations, you'll need to 
+             * send 'status' or 'list' to the serial port.  
+             * How that is accomplished is beyond the scope of this
+             * comment */
             if(teststr.startsWith("status")) {
                 String str = scheduler.displayStatus(true);
                 Serial.print(str);
-            } 
+            } else if(teststr.startsWith("list")) {
+                /** Here are two ways of enumerating the task list 
+                 * The first way uses the list iterator. */
+
+
+                const SimpleList<Task *>& tTasks = scheduler.getTasks();
+                for (const auto* task : tTasks) {
+                    String name = task->getName();
+                    Serial.printf("Name=%s\n",name.c_str());
+                }
+                /** The second way uses the read method of the SimpleList class 
+                 * If you run this twice, you'll notice that the second time
+                 * this loop doesn't ouput anything.  That's because 
+                 * the next read position is at the end.  Use the rewind
+                 * method to reset the pointer. */
+                while(Task *task = tTasks.read()) {
+                    String name = task->getName();
+                    Serial.printf("Name=%s\n",name.c_str());
+                }
+            }
         }
     }
 }
