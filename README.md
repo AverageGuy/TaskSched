@@ -116,11 +116,12 @@ Key methods in the Sched class (https://averageguy.github.io/task-docs/classSche
 - `displayStatus()`: Returns a String with info about some or all of the tasks in the queue.
 - `addTask()`: Adds a task to the queue.
 - `isEnabled()`: Returns a true if the scheduler is enabled or false if it is not.
-- `getTasks()`: Returns a list of the tasks.
+- `getTasks()`: Returns a list of the tasks.  See the example/SkedBlink2.ino file for examples of ways to use this list.
 
 ## Examples
 
 See the `examples` directory for basic examples of blinking an LED using TaskSched and others.
+Also look at the wiki.  It has more examples and explanations.
 
 ## API Reference
 
