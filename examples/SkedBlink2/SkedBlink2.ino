@@ -140,13 +140,15 @@ void loop() {
              * How that is accomplished is beyond the scope of this
              * comment */
             if(teststr.startsWith("status")) {
-                String str = scheduler.displayStatus(true);
-                Serial.print(str);
+                const SimpleList<Task *>& tTasks = scheduler.getTasks();
+                for (const auto* task : tTasks) {
+                    String info = task->showTaskInfo();
+                    Serial.print(info);
+                }
             } else if(teststr.startsWith("list")) {
                 /** Here are two ways of enumerating the task list 
                  * The first way uses the list iterator. */
-
-
+                Serial.println("This output was produced by asking the getTasks function\nto provide a list of the tasks.  It then prints the name\nof each task.");
                 const SimpleList<Task *>& tTasks = scheduler.getTasks();
                 for (const auto* task : tTasks) {
                     String name = task->getName();
@@ -157,6 +159,7 @@ void loop() {
                  * this loop doesn't ouput anything.  That's because 
                  * the next read position is at the end.  Use the rewind
                  * method to reset the pointer. */
+                Serial.println("This output was produced by using the read function of the SimpleList class\nto return a task.  We use the task getName function to print the name.");
                 while(Task *task = tTasks.read()) {
                     String name = task->getName();
                     Serial.printf("Name=%s\n",name.c_str());

@@ -99,7 +99,8 @@ String Task::formatMS(unsigned long milliseconds){
     return String(res); 
 }
 
-String Task::showTaskInfo() {
+String Task::showTaskInfo()  const
+{
 
     char buf[200];
     unsigned long diff = millis() - getLastStartTime();
@@ -243,7 +244,6 @@ unsigned long Sched::getSize()
     * num = 0 show status of enabled tasks only
     *
     * if taskName != "" ignore num setting
-    */
 String Sched::displayStatus(int num,String taskName,bool raw) {
     static char printBuffer[1000]; // used to display status 
 
@@ -298,12 +298,13 @@ String Sched::displayStatus(int num,String taskName,bool raw) {
     String retStr(printBuffer);
     return retStr;
 }
+*/
 
 Sched::Sched() {
 }
 
 void Sched::begin() {
-    this->mSchedEnabled=1;
+    this->mSchedEnabled=true;
 }
 void Sched::addTask(Task *task)
 {
@@ -315,12 +316,12 @@ void Sched::addTask(Task *task)
 };
 
 void Sched::enable() {
-    this->mSchedEnabled=1;
+    this->mSchedEnabled=true;
 }
 void Sched::disable() {
-    this->mSchedEnabled=0;
+    this->mSchedEnabled=false;
 }
-int Sched::isEnabled() {
+bool Sched::isEnabled() {
     return this->mSchedEnabled;
 }
 

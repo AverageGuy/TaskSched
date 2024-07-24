@@ -238,9 +238,9 @@ class Task {
         /**
          * @brief        function that displays task info
          *
-         * @return String containing info about all tasks tasks.
+         * @return String containing info about this task.
          */
-        String showTaskInfo();
+        String showTaskInfo() const;
         /**
          * @brief        return the task interval
          * @return 
@@ -304,7 +304,7 @@ Source:
         * @brief 
         * @return 
         */
-        String displayStatus(int num,String taskName="",bool raw=false);
+//        String displayStatus(int num,String taskName="",bool raw=false);
         Sched();
       /** used to start the scheduling. A call to begin will also enable the scheduler.
 ```
@@ -345,7 +345,7 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
         * @brief        return true if the scheduler is enabled
         * @return 
         */
-        int isEnabled();
+        bool isEnabled();
         /** brief */
         const SimpleList<Task *>& getTasks() const;
         /**
@@ -364,7 +364,7 @@ Task t2(dummy, 2.0, false, 20, "On2", * false);
         * @brief 
         * @return 
         */
-        int mSchedEnabled;
+        bool mSchedEnabled;
 };
 
 ///home/jwl/sketchbook/libraries/TaskSched/TaskSched.h 127 Task Rand_4720, Diff 0:09:054, Interval 0:04:720, RI 0
