@@ -54,7 +54,7 @@ Use Cases:
 To install TaskSched, clone the repository:
 
 ```
-git clone https://github.com/AverageGuy/TaskSched.git
+git clone https://github.com/AverageGuy/tasksched.git
 ```
 
 Or download the [ZIP](https://github.com/AverageGuy/TaskSched/archive/refs/heads/main.zip) file.
