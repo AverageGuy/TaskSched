@@ -3,6 +3,11 @@
   TemplateDemo
 
  Author: Jim Lynch
+ * NOTE: the authors of some of these libraries have made changes that 
+ * have caused this code to stop working, even not compile, so use this 
+ * as an example of what can be done, even though it's not working.  I 
+ * can't seem to keep up with the boneheads that think converting working
+ * code into garbage is productive.
 */
 
 #if defined(ESP8266)
