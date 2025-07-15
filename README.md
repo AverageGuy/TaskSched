@@ -42,22 +42,22 @@ Use Cases:
 
 ## Main Features
 
-1. **Periodic task execution**: Tasks can be set to run at specified intervals, with times specified in milliseconds or seconds.
+1. **Periodic task execution**: Tasks can be set to run at specified intervals, with times specified in milliseconds.
 2. **Task enable/disable support**: Tasks can be dynamically enabled or disabled.
 3. **Iteration control**: Tasks can be set to run for a specific number of iterations or indefinitely.
 4. **Immediate or delayed execution**: Tasks can be scheduled to run immediately when enabled or wait for the interval to expire.
 5. **Task restart and parameter modification**: Tasks can be restarted with original or new parameters (interval, callback function, etc.).
-6. **Flexible timing control**: The scheduler can be run periodically in the main loop.
+6. **Flexible timing control**: The scheduler should be run periodically in the main loop.
 
 ## Installation
 
 To install TaskSched, clone the repository:
 
 ```
-git clone https://github.com/AverageGuy/tasksched.git
+git clone https://github.com/AverageGuy/TaskSched.git
 ```
 
-Or download the [ZIP](https://github.com/AverageGuy/pyconky/archive/refs/heads/main.zip) file.
+Or download the [ZIP](https://github.com/AverageGuy/TaskSched/archive/refs/heads/main.zip) file.
 
 ## Usage
 
