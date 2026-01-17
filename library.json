@@ -1,0 +1,22 @@
+{
+  "name": "TaskSched",
+  "keywords": "multitasking, cooperative, event, task, taskscheduler, scheduling",
+  "description": "Cooperative multitasking for Arduino, ESPx and other microcontrollers",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/averageguy/TaskSched"
+  },
+  "authors":
+  [
+    {
+      "name": "Jim Lynch",
+      "email": "jim.lynch1@gmail.com",
+      "url": "https://github.com/averageguy",
+      "maintainer": true
+    }
+  ],
+  "version": "0.0.1",
+  "frameworks": "arduino",
+  "platforms": "*"
+}
