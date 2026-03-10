@@ -1,14 +1,14 @@
 
 /**
-  TemplateDemo for ESP32
+  TemplateDemo for ESP32 (Async Version)
 
  Author: Jim Lynch
- Adapted for ESP32
+ Adapted for ESP32 with AsyncWebServer and SafePtr
 */
 
 #include <WiFi.h>
 #include <WiFiClient.h>
-#include <WebServer.h>
+#include <ESPAsyncWebServer.h>
 #include <ElegantOTA.h>
 #include <TaskSched.h>
 #include <TelnetSpy.h>
@@ -18,7 +18,7 @@ const char* ssid = "Your_SSID";
 const char* password = "Your_Password";
 
 const char* mqtt_server = "mosquitto.org";
-WebServer server(80);
+AsyncWebServer server(80);
 
 WiFiClient espClient;
 PubSubClient client(mqtt_server, 1883, espClient); // 1883 is the listener port for the Broker
@@ -37,18 +37,13 @@ void waitMQTT(Task *);
 void runForever(Task *task);
 void mqttLoop(Task *task);
 
-Task* tStart = new Task(connectNet, 100, true, 1, "Conn", true);
-/** start with this task, run immediately, task is enabled but run only once. */
-Task* tWait = new Task(waitForConn, 2500, false, 20, "Wait", false);
-/** This task is kicked off by tStart to wait for a connect. */
-Task* tConnMQTT = new Task(connectMQTT, 100, false, 1, "ConnMQTT", true);
-/** If we got connected then this task is run once to connect to MQTT */
-Task* tWaitMQTT = new Task(waitMQTT, 500, false, 20, "Run", false);
-/** This is run by the tConnMQTT to wait for a connect.  See tWait above */
-Task* tRun = new Task(runForever, 10000, false, 0, "Run", true);
-/** if everything is good, then maybe do something with the data, or not */
-Task* tmqttLoop = new Task(mqttLoop, 100, false, 0, "MQTTLoop", true);
-/** call client.loop frequently */
+// Use SafePtr<Task> as expected by the library in the user's environment
+SafePtr<Task> tStart = SafePtr<Task>(new Task(connectNet, 100, true, 1, "Conn", true));
+SafePtr<Task> tWait = SafePtr<Task>(new Task(waitForConn, 2500, false, 20, "Wait", false));
+SafePtr<Task> tConnMQTT = SafePtr<Task>(new Task(connectMQTT, 100, false, 1, "ConnMQTT", true));
+SafePtr<Task> tWaitMQTT = SafePtr<Task>(new Task(waitMQTT, 500, false, 20, "Run", false));
+SafePtr<Task> tRun = SafePtr<Task>(new Task(runForever, 10000, false, 0, "Run", true));
+SafePtr<Task> tmqttLoop = SafePtr<Task>(new Task(mqttLoop, 100, false, 0, "MQTTLoop", true));
 
 void telnetConnected() {
     SERIAL.println("Telnet connection established.");
@@ -98,15 +93,15 @@ void waitForConn(Task *task) {
         SERIAL.print("IP address: ");
         SERIAL.println(WiFi.localIP());
 
-        server.on("/", []() {
-            server.send(200, "text/plain", "Hi! I am ESP32.");
+        server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+            request->send(200, "text/plain", "Hi! I am ESP32 (Async).");
         });
 
         ElegantOTA.begin(&server);
         ElegantOTA.onStart(onOTAStart);
         ElegantOTA.onEnd(onOTAEnd);
         server.begin();
-        SERIAL.println("HTTP server started");
+        SERIAL.println("Async HTTP server started");
 
         SerialAndTelnet.setWelcomeMsg("Welcome to the ESP32 TelnetSpy example\n\n");
         SerialAndTelnet.setCallbackOnConnect(telnetConnected);
@@ -161,7 +156,6 @@ void waitMQTT(Task *task) {
 
 void runForever(Task *task) {
     if(WiFi.status() != WL_CONNECTED)  {
-        // Restart all logic or just wait for WiFi to reconnect
         return;
     }
     if(!client.connected()) { 
@@ -172,9 +166,7 @@ void runForever(Task *task) {
 }
 
 void mqttLoop(Task *task) {
-    if(!client.connected()) { 
-        // Logic handled in runForever or here
-    } else {
+    if(client.connected()) {
         client.loop();
     }
 }
@@ -182,8 +174,9 @@ void mqttLoop(Task *task) {
 void setup(void) {
     Serial.begin(115200);
     delay(100);
-    Serial.println("Starting ESP32 scheduler\n");
+    Serial.println("Starting ESP32 Async scheduler\n");
     
+    // Add tasks using SafePtr
     scheduler.addTask(tStart);
     scheduler.addTask(tWait);
     scheduler.addTask(tConnMQTT);
@@ -195,8 +188,7 @@ void setup(void) {
 }
 
 void loop(void) {
-    server.handleClient();
-    ElegantOTA.loop();
+    // server.handleClient() and ElegantOTA.loop() are NOT needed for Async version
     SerialAndTelnet.handle();
     scheduler.run();
 }
