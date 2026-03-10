@@ -199,7 +199,8 @@ void Task::runIt() {
         return;
     }
 
-    if ((mRunImmediately && mIterationCount == 0) || (millis() - mLastStartTime) > mInterval) {
+    bool timerTriggered = (millis() - mLastStartTime) > mInterval;
+    if ((mRunImmediately && mIterationCount == 0) || timerTriggered) {
         mRunImmediately = false;
 
         unsigned long diff = millis() - getLastStartTime();
@@ -220,8 +221,8 @@ void Task::runIt() {
 #endif
         if(mIterationCount>=mIterations && mIterations != 0) {
             disable();
-        } else {
-            mLastStartTime=millis();
+        } else if (timerTriggered) {
+            mLastStartTime += mInterval;
         }
 #ifdef DEBUG
         //        Serial.printf("%s in runit count is %ld\n",getName(),mIterationCount);
