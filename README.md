@@ -131,6 +131,10 @@ For detailed API documentation, please refer to the Doxygen-generated documentat
 
 If you encounter any issues or have feature requests, please open an issue on the GitHub repository.
 
+If you are having trouble with TelnetSpy running correctly if you are running the DemoTemplate32 example with the
+ESP32-c3 or s3 or s2 or any other RISC-V processors.  I have a patch for it.
+Please visit the wiki (https://github.com/AverageGuy/TaskSched/wiki) for details.
+
 ## Contributing
 
 Contributions to TaskSched are welcome. Please feel free to submit pull requests or open issues to discuss potential improvements.
