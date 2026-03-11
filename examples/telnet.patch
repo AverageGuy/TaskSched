@@ -1,0 +1,24 @@
+--- /home/jwl/Documents/PlatformIO/Projects/fayettelights/.pio/libdeps/d1_mini_pro/TelnetSpy/TelnetSpy.cpp	2026-01-22 09:48:33.469336779 -0500
++++ /home/jwl/sketchv2/libraries/telnetspy/TelnetSpy.cpp	2026-03-11 09:36:41.547351354 -0400
+@@ -14,7 +14,11 @@
+ #endif
+ 
+ #include "TelnetSpy.h"
+-
++#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
++    #include "rom/uart.h"   // provides ets_write_char_uart
++#else
++    #include "esp_rom_uart.h"  // or rom/uart.h depending on IDF version
++#endif
+ #ifndef min
+ #define min(a,b) ((a)<(b)?(a):(b))
+ #endif
+@@ -340,6 +344,8 @@
+ 	}
+ #ifdef ESP8266
+     ets_putc(data);
++#elif defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2)
++    esp_rom_output_tx_one_char(data);
+ #else
+     ets_write_char_uart(data);
+ #endif
